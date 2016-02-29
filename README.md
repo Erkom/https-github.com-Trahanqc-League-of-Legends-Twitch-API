@@ -9,7 +9,7 @@ To install any of those commands, you are required to use a bot that has an acce
 To add a command, you can go into the [Command generator](http://gotne.site-meute.com/api/v1/command-generator).  You will need to grab your League of Legends ID from that page and select which command you want to add into your bot.  Once every settings is done, generate the command and copy paste the output into your chat or your bot panel.
 
 #### Login with the website
-To have access to settings and multiple statistics, login with your Twitch account.  You will then be able to change the summoner name that the commands will be fetching from, the season to fetch from, etc. **Comming soon** You will also be able to edit the output of these commands and be able to submit tickets for any help/problems.
+To have access to settings and multiple statistics, login with your Twitch account.  You will then be able to change the summoner name that the commands will be fetching from, the season to fetch from, etc. **Coming soon** You will also be able to edit the output of these commands and be able to submit tickets for any help/problems.
 
 ## Available commands
 There is a lot of commands currently available through the application.  So see further notes on these commands, go check out the [commands list](http://gotme.site-meute.com/api/v1/commands-list)
