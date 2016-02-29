@@ -12,7 +12,7 @@ To add a command, you can go into the [Command generator](http://gotne.site-meut
 To have access to settings and multiple statistics, login with your Twitch account.  You will then be able to change the summoner name that the commands will be fetching from, the season to fetch from, etc. **Comming soon** You will also be able to edit the output of these commands and be able to submit tickets for any help/problems.
 
 ## Available commands
-There is a lot of commands currently available through the application.  So see further notes on these commands, go check out the [commands list](http://gotme.site-meute.com/api/v1/dashboard)
+There is a lot of commands currently available through the application.  So see further notes on these commands, go check out the [commands list](http://gotme.site-meute.com/api/v1/commands-list)
 
 #### !doublekills
 Display the numbers of doublekills you have and with which champions.
