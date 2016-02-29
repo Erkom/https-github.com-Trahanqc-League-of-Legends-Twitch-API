@@ -1,0 +1,161 @@
+body {
+    /*background-color: #373a3c;*/
+}
+
+.navbar .nav-right {
+    float: right !important;
+    padding: 0 15px;
+}
+
+.navbar .nav .nav-item a.active {
+    background-color: #9d9d9d !important;
+    color: #fff;
+}
+
+.navbar .nav .nav-item a:not(.active) {
+    color: #9d9d9d;
+}
+
+.navbar .nav .nav-item a:hover {
+    color: #fff;
+    background-color: #222;
+}
+
+.navbar .nav .nav-item.open a.nav-link {
+    color: #fff;
+    background-color: #222;
+}
+
+#wrapper {
+    padding-top: 56px;
+}
+
+#sidebar {
+    position: fixed;
+    bottom: 0;
+    top: 56px;
+    width: 12%;
+    float: left;
+    background-color: #373a3c;
+}
+
+#sidebar .nav>li:first-child {
+    border-top: 2px solid #222;
+}
+
+#sidebar .nav li a {
+    display: block;
+    padding: 10px 15px;
+    color: #9d9d9d;
+}
+
+#sidebar .nav li:hover {
+    background-color: #222;
+}
+
+#sidebar .nav li:hover a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#sidebar .nav li.active {
+    background-color: #222;
+}
+
+#sidebar .nav li.active a {
+    color: #fff;
+    text-decoration: none;
+}
+
+#content {
+    width: 88%;
+    margin-left: 12%;
+    background-color: #fff;
+    padding-left: 15px;
+}
+
+#content .page-header {
+    padding-bottom: 9px;
+    margin: 40px 0 20px;
+    border-bottom: 1px solid #eee;
+}
+
+#content .bot-name {
+    margin: 40px 0 10px;
+}
+
+#commands-generator td:first-child, #commands-generator td:nth-child(3), #commands-generator td:nth-child(4) {
+    max-width: 300px;
+}
+
+.command-title {
+    padding-bottom: 10px;
+}
+
+.command-code {
+    padding-bottom: 15px;
+}
+
+#commands-table tbody td:first-child {
+    width: 250px;
+}
+
+#commands-table tbody td:last-child {
+    width: 150px;
+}
+
+.blank {
+    padding-bottom: 30px;
+}
+
+.navbar.navbar-bottom a.navbar-brand {
+    color: #373a3c;
+    border-top: 2px solid black;
+    margin-left: -20px;
+    margin-top: -9px;
+    margin-bottom: 9px;
+}
+
+.navbar.navbar-bottom a.navbar-brand:hover {
+    color: #373a3c;
+    cursor: default;
+}
+
+.navbar.navbar-bottom p {
+    color: #9d9d9d;
+    padding-top: 10px;
+    margin-bottom: -10px;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.full-width {
+    width: 100%;
+}
+
+.fix-lineheight {
+    line-height: 40px;
+}
+
+/******************************************
+        BLOG
+******************************************/
+
+.post-content {
+    background-color: #e8e8e8;
+    border-radius: 3px;
+}
+
+.post-details {
+    width: 10%;
+    padding: 5px 10px;
+    display: inline-block;
+}
+
+.post-message {
+    width: 80%;
+    padding: 5px 15px;
+    display: inline-block;
+}
