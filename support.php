@@ -72,9 +72,13 @@ $categories = getAllFromTable("blogCategory", "", "ordre ASC");
                                     </select>
                                 </div>
 
-                                <?php if(!empty($user) && $user[0]['twitchUsername'] == 'trahanqc') : ?>
+                                <?php if(!empty($user)) : ?>
                                     <div class="col-sm-2 col-sm-offset-7">
                                         <button class="btn btn-primary full-width" id="btn-add-message"><i class="fa fa-plus"></i>  Add message</button>
+                                    </div>
+                                <?php else : ?>
+                                    <div class="col-sm-2 col-sm-offset-7">
+                                        <p class="lead pull-right">Login to add a post</p>
                                     </div>
                                 <?php endif; ?>
                             </div>
