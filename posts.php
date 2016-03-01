@@ -5,6 +5,7 @@ $twitchtv = new TwitchTV;
 $user = checkConnect();
 $message = "";
 $postLocked = getDisabled($_GET['id']);
+$addReply = foundPost($_GET['id']);
 
 if($postLocked) {
     $message = addAlert("This post is locked and no further replies are allowed", "alert-locked", true);
@@ -68,10 +69,12 @@ if($postLocked) {
                             <div id="results"><?php fetchPost($_GET['id']); ?></div>
 
                             <div id="controls">
-                                <?php if(isset($_SESSION['username'])) : ?>
-                                    <button class="btn btn-primary pull-right" id="add-reply" <?= ($postLocked) ? 'disabled' : ''; ?>><i class="fa fa-reply"></i> Add a reply</button>
-                                <?php else: ?>
-                                    <p class="lead">You need to be logged in to add a reply on this post.</p>
+                                <?php if($addReply) : ?>
+                                    <?php if(isset($_SESSION['username'])) : ?>
+                                        <button class="btn btn-primary pull-right" id="add-reply" <?= ($postLocked) ? 'disabled' : ''; ?>><i class="fa fa-reply"></i> Add a reply</button>
+                                    <?php else: ?>
+                                        <p class="lead">You need to be logged in to add a reply on this post.</p>
+                                    <?php endif; ?>
                                 <?php endif; ?>
                             </div>
 

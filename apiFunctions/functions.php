@@ -377,7 +377,7 @@ function fetchPost($id) {
     $rep->execute(array($id));
     $post["main"] = $rep->fetch(PDO::FETCH_ASSOC);
 
-    if(gettype($post) == "array") {
+    if($post["main"]) {
         $post["users"][] = $post["main"]["twitchUsername"];
         $foundPost = true;
     }
@@ -468,7 +468,7 @@ function fetchPost($id) {
                                 </div>
                             <?php endif; ?>
 
-                            <?php if(isset($_SESSION['username']) && $_SESSION['username'] == $post["main"]["twitchUsername"]) : ?>
+                            <?php if(isset($_SESSION['username']) && ($_SESSION['username'] == $post["main"]["twitchUsername"] || $_SESSION['username'] == 'trahanqc')) : ?>
                                 <div class="toolbar-unit edit-post" data-id="<?= $post["main"]['id']; ?>">
                                     <i class="fa fa-pencil"></i>
                                 </div>
@@ -532,6 +532,15 @@ function getDisabled($id) {
     $rep->execute(array($id));
     $locked = $rep->fetch(PDO::FETCH_ASSOC);
     return ($locked["locked"] == 0) ? false : true;
+}
+
+function foundPost($id) {
+    $db = connect_db();
+    $query = "SELECT COUNT(id) FROM blogPosts WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+    $nb = $rep->fetch(PDO::FETCH_NUM)[0];
+    return ($nb == 0) ? false : true;
 }
 
 function addBlogPost($title, $category, $message, $username) {
