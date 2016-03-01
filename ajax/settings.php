@@ -1,5 +1,5 @@
 <?php
-require_once '../../apiFunctions/init.php';
+require_once '../apiFunctions/init.php';
 
 switch($_POST['action']) {
     case 'updateSummonerName':
@@ -8,5 +8,29 @@ switch($_POST['action']) {
 
     case "fetchMessages" :
         fetchMessages($_POST['id']);
+        break;
+
+    case "deleteComment" :
+        deleteComment($_POST['id']);
+        break;
+
+    case "addComment" :
+        echo addComment($_POST['id'], $_POST['message']);
+        break;
+
+    case "deletePost" :
+        deletePost($_POST['id']);
+        break;
+
+    case "lockPost" :
+        echo lockPost($_POST['id'], $_POST['state']);
+        break;
+
+    case "updatePost" :
+        echo updatePost($_POST['id'], $_POST['title'], $_POST['message']);
+        break;
+
+    case "updateComment" :
+        echo updateComment($_POST['id'], $_POST['message']);
         break;
 }

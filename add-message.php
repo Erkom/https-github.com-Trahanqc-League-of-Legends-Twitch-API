@@ -121,7 +121,7 @@ if($message == "" && empty($user)) {
         </div>
 
         <?php include 'includes/footer.php'; ?>
-        <script src="js/add-message.js"></script>
+        <script src="../js/add-message.js"></script>
 
     </body>
 </html>
