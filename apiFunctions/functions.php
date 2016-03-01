@@ -555,7 +555,7 @@ function addBlogPost($title, $category, $message, $username) {
             $message,
             0,
             0,
-            date('Y-m-d H:m:i', strtotime("now -6hours"))
+            date('Y-m-d H:i:s', strtotime("now -6hours"))
             ));
     return $db->lastInsertId();
 }
