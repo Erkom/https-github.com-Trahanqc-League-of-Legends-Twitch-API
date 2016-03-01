@@ -105,7 +105,7 @@ $regions = getRegions();
                                     </div>
 
                                     <div class="col-lg-1">
-                                        <button class="btn btn-success full-width" id="changeSummonerName"><i class="fa fa-save"></i>  Save</button>
+                                        <button class="btn btn-success full-width" id="changeSummonerName" data-message="Saving..."><i class="fa fa-save"></i>  Save</button>
                                     </div>
                                 </div>
 
@@ -175,7 +175,7 @@ $regions = getRegions();
                             data: { summonerName: summonerName.val(), region: region.val() },
                             success: function(data) {
                                 if(data.length == 0 || data.length > 10) {
-                                    addAlert("The summoner name does not exist.", "alert-danger", true, true, "#messages");
+                                    addAlert("The summoner name does not exist.", "alert-danger", true, true, "#messages", 3, "#changeSummonerName");
                                 }
                                 else {
                                     $.ajax({
@@ -185,7 +185,7 @@ $regions = getRegions();
                                         data: { action: "updateSummonerName", summonerName: summonerName.val(), region: region.val(), summonerId: data, season: season.val(), lang: lang.val() },
                                         success: function(data) {
                                             if(data === "1") {
-                                                addAlert("The commands has been updated successfully!", "alert-success", true, true, "#messages");
+                                                addAlert("The commands has been updated successfully! <span class='alert-span'>3</span>", "alert-success", true, true, "#messages", 3, "#changeSummonerName");
                                             }
                                             else {
                                                 addAlert(data, "alert-danger", true, true, "#messages");

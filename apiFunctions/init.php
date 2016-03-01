@@ -18,7 +18,8 @@ function far_dump($string) {
 }
 
 function addAlert($message, $classes, $dismiss = true) {
-    $alert = "<div class='alert alert-dismissible " . $classes . "' role='alert'>";
+    $class = ($classes == "alert-locked") ? 'alert-info' : $classes;
+    $alert = "<div class='alert alert-dismissible " . $class . "' role='alert'>";
     if($dismiss) {
         $alert .= "<button type='button' class='close' data-dismiss='alert'><span aria-hidden='true'>&times;</span><span class='sr-only'>Close</span></button>";
     }
@@ -34,6 +35,9 @@ function addAlert($message, $classes, $dismiss = true) {
             break;
 
         case 'alert-info' : $alert .= '<i class="fa fa-cog" aria-hidden="true"></i> ';
+            break;
+
+        case 'alert-locked' : $alert .= '<i class="fa fa-lock" aria-hidden="true"></i> ';
             break;
     }
 

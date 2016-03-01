@@ -4,11 +4,16 @@ $twitchtv = new TwitchTV;
 
 $user = checkConnect();
 $message = "";
+$postLocked = getDisabled($_GET['id']);
+
+if($postLocked) {
+    $message = addAlert("This post is locked and no further replies are allowed", "alert-locked", true);
+}
 ?>
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Publication | Trahanqc's API</title>
+        <title>Post | Trahanqc's API</title>
 
         <?php include 'includes/header.php'; ?>
 
@@ -42,7 +47,7 @@ $message = "";
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h1 class="page-header">Publication</h1>
+                            <h1 class="page-header">Post</h1>
 
                             <ol class="breadcrumb">
                                 <li>
@@ -58,11 +63,88 @@ $message = "";
 
                             <div class="blank"></div>
 
+                            <div id="alerts"><?= $message; ?></div>
+
                             <div id="results"><?php fetchPost($_GET['id']); ?></div>
 
-                            <?php for($x = 0; $x < 8; $x++) : ?>
+                            <div id="controls">
+                                <?php if(isset($_SESSION['username'])) : ?>
+                                    <button class="btn btn-primary pull-right" id="add-reply" <?= ($postLocked) ? 'disabled' : ''; ?>><i class="fa fa-reply"></i> Add a reply</button>
+                                <?php else: ?>
+                                    <p class="lead">You need to be logged in to add a reply on this post.</p>
+                                <?php endif; ?>
+                            </div>
+
+                            <?php for($x = 0; $x < 13; $x++) : ?>
                                 <div class="blank"></div>
                             <?php endfor; ?>
+                        </div>
+                    </div>
+
+                    <div class="row" id="add-reply-container">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p class="lead">Add a reply</p>
+                                        <i class="fa fa-close pull-right" id="close-reply"></i>
+
+                                        <div class="form-group">
+                                            <textarea class="form-control" rows="8" id="add-reply-input" placeholder="Type you reply here."></textarea>
+                                        </div>
+
+                                        <div class="col-lg-2 col-lg-offset-10 no-padding-right">
+                                            <button class="btn btn-primary full-width" id="add-reply-btn" data-id="<?= $_GET['id']?>"><i class="fa fa-reply"></i> Reply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="edit-reply-container">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p class="lead">Edit your reply</p>
+                                        <i class="fa fa-close pull-right" id="close-edit-reply"></i>
+
+                                        <div class="form-group">
+                                            <textarea class="form-control" rows="8" id="edit-reply-input" placeholder="Type you reply here."></textarea>
+                                        </div>
+
+                                        <div class="col-lg-2 col-lg-offset-10 no-padding-right">
+                                            <button class="btn btn-success full-width" id="edit-reply-btn" data-id="<?= $_GET['id']?>"><i class="fa fa-save"></i> Edit reply</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" id="edit-post-container">
+                        <div class="col-lg-12">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <p class="lead">Edit your post</p>
+                                        <i class="fa fa-close pull-right" id="close-edit-post"></i>
+
+                                        <div class="form-group">
+                                            <input class="form-control" id="edit-post-title" placeholder="Title of the post">
+                                        </div>
+
+                                        <div class="form-group">
+                                            <textarea class="form-control" rows="7" id="edit-post-message" placeholder="Type the content of the post here."></textarea>
+                                        </div>
+
+                                        <div class="col-lg-2 col-lg-offset-10 no-padding-right">
+                                            <button class="btn btn-success full-width" id="edit-post-btn" data-id="<?= $_GET['id']?>"><i class="fa fa-save"></i> Edit post</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -70,7 +152,8 @@ $message = "";
         </div>
 
         <?php include 'includes/footer.php'; ?>
-        <script src="js/jquery.timeago.js"></script>
+        <script src="../js/jquery.timeago.js"></script>
+        <script src="../js/posts.js"></script>
 
     </body>
 </html>

@@ -274,23 +274,40 @@ function updateSummonerName($summonerName, $region, $summonerId, $season, $lang)
     }
 }
 
+function fetchMessages2($id) {
+    echo $id;
+}
+
 function fetchMessages($category = "all") {
     $db = connect_db();
     $query = "SELECT COUNT(id) FROM blogPosts";
-    $query .= ($category != "all") ? " WHERE categoryId = " . $category : "";
+    $query .= ($category != "all") ? " WHERE categoryId = " . $category: "";
     $rep = $db->prepare($query);
     $rep->execute();
     $nb = $rep->fetch(PDO::FETCH_NUM)[0];
 
-    $query = "SELECT p.id, p.title, p.twitchUsername, p.views, p.datePosted
-            FROM blogPosts p
-            LEFT JOIN blogPostsComments bpc ON bpc.postId = p.id
-            LEFT JOIN blogComments c ON c.id = bpc.commentId
-            INNER JOIN blogCategory bc ON bc.id = p.categoryId";
-    $query .= ($category != "all") ? " WHERE categoryId = " . $category : "";
+    $query = "SELECT p.id, p.title, p.twitchUsername, p.views, p.datePosted, p.locked, bc.category
+          FROM blogPosts p
+          INNER JOIN blogCategory bc ON bc.id = p.categoryId";
+    $query .= ($category != "all") ? " WHERE p.categoryId = " . $category : "";
     $query .= " ORDER BY p.datePosted DESC";
     $rep = $db->prepare($query);
     $rep->execute();
+
+    $query2 = "SELECT COUNT(c.id)
+          FROM blogComments c
+          INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+          INNER JOIN blogPosts p ON p.id = bpc.postId
+          WHERE p.id = ?";
+    $rep2 = $db->prepare($query2);
+
+    $query3 = "SELECT c.datePosted
+            FROM blogComments c
+            INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+            INNER JOIN blogPosts p ON p.id = bpc.postId
+            WHERE p.id = ?
+            ORDER BY c.datePosted DESC";
+    $rep3 = $db->prepare($query3);
 
     $max = 16;
 
@@ -301,17 +318,28 @@ function fetchMessages($category = "all") {
                 <tr>
                     <th>Title</th>
                     <th>Created by</th>
+                    <th>Category</th>
+                    <th>Replies</th>
                     <th>Views</th>
                     <th>Activity</th>
                 </tr>
             </thead>
             <tbody>
-                <?php while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) : ?>
+                <?php
+                while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) :
+                    $rep2->execute(array($donnees['id']));
+                    $nbComments = $rep2->fetch(PDO::FETCH_NUM)[0];
+
+                    $rep3->execute(array($donnees['id']));
+                    $lastActivity = $rep3->fetch(PDO::FETCH_ASSOC);
+                    ?>
                     <tr>
-                        <td><a href="posts-<?= $donnees['id']; ?>"><?= $donnees['title']; ?></a></td>
+                        <td><a href="posts-<?= $donnees['id']; ?>"><?= ($donnees['locked'] == 1) ? '<i class="fa fa-lock"></i> ' . $donnees['title'] : $donnees['title']; ?></a></td>
                         <td><?= $donnees['twitchUsername']; ?></td>
+                        <td><?= $donnees["category"]; ?></td>
+                        <td><?= $nbComments; ?></td>
                         <td><?= $donnees['views']?></td>
-                        <td><time class="timeago" datetime="<?= $donnees['datePosted']; ?>"><?= format_date($donnees['datePosted']); ?></time></td>
+                        <td><time class="timeago" datetime="<?= ($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']; ?>"><?= format_date(($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']); ?></time></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -338,43 +366,177 @@ function fetchMessages($category = "all") {
 function fetchPost($id) {
     $id = (int)$id;
     $db = connect_db();
+    $foundPost = false;
+
+    $query = "UPDATE blogPosts SET views = views + 1 WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+
     $query = "SELECT p.*, c.category FROM blogPosts p INNER JOIN blogCategory c ON c.id = p.categoryId WHERE p.id = ?";
     $rep = $db->prepare($query);
     $rep->execute(array($id));
-    $post = $rep->fetch(PDO::FETCH_ASSOC);
+    $post["main"] = $rep->fetch(PDO::FETCH_ASSOC);
 
-    $query2 = "SELECT p.title, p.twitchUsername, p.views, p.datePosted
-            FROM blogPosts p
-            LEFT JOIN blogPostsComments bpc ON bpc.postId = p.id
-            LEFT JOIN blogComments c ON c.id = bpc.commentId
-            INNER JOIN blogCategory bc ON bc.id = p.categoryId
+    if(gettype($post) == "array") {
+        $post["users"][] = $post["main"]["twitchUsername"];
+        $foundPost = true;
+    }
+
+    $query = "SELECT COUNT(c.id)
+          FROM blogComments c
+          INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+          INNER JOIN blogPosts p ON p.id = bpc.postId
+          WHERE p.id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+    $nbComments = $rep->fetch(PDO::FETCH_NUM)[0];
+
+    $query = "SELECT c.id, c.twitchUsername, c.datePosted, c.message
+            FROM blogComments c
+            INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+            INNER JOIN blogPosts p ON p.id = bpc.postId
             WHERE p.id = ?
-            ORDER BY p.datePosted ASC, c.datePosted ASC";
+            ORDER BY c.datePosted ASC";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+
+    while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) {
+        $post["comments"][] = $donnees;
+
+        if(!in_array($donnees['twitchUsername'], $post["users"])) {
+            $post["users"][] = $donnees['twitchUsername'];
+        }
+    }
+
+    $query = "SELECT c.datePosted
+            FROM blogComments c
+            INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+            INNER JOIN blogPosts p ON p.id = bpc.postId
+            WHERE p.id = ?
+            ORDER BY c.datePosted DESC";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+    $lastActivity = $rep->fetch(PDO::FETCH_ASSOC);
+
+    if($foundPost) :
     ?>
-    <div class="post">
-        <div class="post-title">
-            <h3><?= $post['title']; ?> &#8212; <small class="text-muted"><?= $post['category']; ?></small></h3>
-        </div>
-
-        <div class="blank"></div>
-
-        <div class="post-content">
-            <div class="post-details">
-                <?= $post['twitchUsername']; ?> <br>
-                <time class="timeago" datetime="<?= $post['datePosted']; ?>"><?= format_date($post['datePosted']); ?></time>
+        <div class="post">
+            <div class="post-title">
+                <h3><span><?= $post["main"]['title']; ?></span> &#8212; <small class="text-muted"><?= $post["main"]['category']; ?></small></h3>
             </div>
 
-            <div class="post-message">
-                <?= nl2br($post['message']); ?>
+            <div class="post-stats">
+                <div class="post-stats-unit">
+                    <div class="post-stats-number"><?= $nbComments; ?></div>
+                    <div class="post-stats-description">Replies</div>
+                </div>
+
+                <div class="post-stats-unit">
+                    <div class="post-stats-number"><?= $post["main"]['views']; ?></div>
+                    <div class="post-stats-description">Views</div>
+                </div>
+
+                <div class="post-stats-unit">
+                    <div class="post-stats-number"><?= count($post["users"]); ?></div>
+                    <div class="post-stats-description">Users</div>
+                </div>
+
+                <div class="post-stats-unit">
+                    <div class="post-stats-number"><time class="timeago" datetime="<?= ($lastActivity != NULL) ? $lastActivity["datePosted"] : $post["main"]['datePosted']; ?>"><?= format_date(($lastActivity != NULL) ? $lastActivity["datePosted"] : $post["main"]['datePosted']); ?></time></div>
+                    <div class="post-stats-description">Last activity</div>
+                </div>
             </div>
+
+            <div class="post-content post-main-content">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="post-details">
+                            <?= $post["main"]['twitchUsername']; ?> <br>
+                            <time class="timeago" datetime="<?= $post["main"]['datePosted']; ?>"><?= format_date($post["main"]['datePosted']); ?></time>
+                        </div>
+                    </div>
+
+                    <div class="divider"></div>
+
+                    <div class="col-lg-10 post-message-container">
+                        <div class="post-message" id="post-<?= $post["main"]["id"]; ?>"><?= nl2br($post["main"]['message']); ?></div>
+
+                        <div class="post-toolbar hidden">
+                            <?php if(isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") : ?>
+                                <div class="toolbar-unit lock-post" data-id="<?= $post['main']['id']; ?>" data-locked="<?= $post["main"]["locked"]; ?>">
+                                    <i class="fa fa-<?= ($post["main"]["locked"] == "0") ? 'lock' : 'unlock'; ?>"></i>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if(isset($_SESSION['username']) && $_SESSION['username'] == $post["main"]["twitchUsername"]) : ?>
+                                <div class="toolbar-unit edit-post" data-id="<?= $post["main"]['id']; ?>">
+                                    <i class="fa fa-pencil"></i>
+                                </div>
+
+                                <div class="toolbar-unit delete-post" data-id="<?= $post["main"]['id']; ?>">
+                                    <i class="fa fa-trash"></i>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <?php
+            if(array_key_exists("comments", $post)) :
+                foreach($post["comments"] as $val) :
+                    ?>
+                    <div class="post-content" id="comment-<?= $val['id']; ?>">
+                        <div class="row">
+                            <div class="col-lg-2">
+                                <div class="post-details">
+                                    <?= $val['twitchUsername']; ?> <br>
+                                    <time class="timeago" datetime="<?= $val['datePosted']; ?>"><?= format_date($val['datePosted']); ?></time>
+                                </div>
+                            </div>
+
+                            <div class="divider"></div>
+
+                            <div class="col-lg-10 post-message-container">
+                                <div class="post-message" id="message-<?= $val['id']; ?>"><?= nl2br($val['message']); ?></div>
+
+                                <?php if(isset($_SESSION['username']) && ($_SESSION['username'] == $val["twitchUsername"] || $_SESSION['username'] == 'trahanqc')) : ?>
+                                    <div class="post-toolbar hidden">
+                                        <div class="toolbar-unit modif-comment" data-id="<?= $val['id']; ?>">
+                                            <i class="fa fa-pencil"></i>
+                                        </div>
+
+                                        <div class="toolbar-unit delete-comment" data-id="<?= $val['id']; ?>">
+                                            <i class="fa fa-trash"></i>
+                                        </div>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                <?php
+                endforeach;
+            endif;
+            ?>
         </div>
-    </div>
+    <?php else : ?>
+        <p>The post you are looking for doesn't exist.</p>
     <?php
+    endif;
+}
+
+function getDisabled($id) {
+    $db = connect_db();
+    $query = "SELECT locked FROM blogPosts WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($id));
+    $locked = $rep->fetch(PDO::FETCH_ASSOC);
+    return ($locked["locked"] == 0) ? false : true;
 }
 
 function addBlogPost($title, $category, $message, $username) {
     $db = connect_db();
-    $query = "INSERT INTO blogPosts VALUES(?, ?, ?, ?, ?, ?, ?)";
+    $query = "INSERT INTO blogPosts VALUES(?, ?, ?, ?, ?, ?, ?, ?)";
     $rep = $db->prepare($query);
     $rep->execute(
         array('',
@@ -383,9 +545,120 @@ function addBlogPost($title, $category, $message, $username) {
             $title,
             $message,
             0,
+            0,
             date('Y-m-d H:m:i', strtotime("now -6hours"))
             ));
     return $db->lastInsertId();
+}
+
+function deletePost($postId) {
+    $db = connect_db();
+    $query = "DELETE p, bpc, c FROM blogPosts p
+            INNER JOIN blogPostsComments bpc ON bpc.postId = p.id
+            INNER JOIN blogComments c ON c.id = bpc.commentId
+            WHERE p.id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($postId));
+}
+
+function lockPost($postId, $state = "0") {
+    $db = connect_db();
+
+    $stateChange = ($state == "1") ? 0 : 1;
+
+    if(isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") {
+        $query = "UPDATE blogPosts SET locked = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array($stateChange, $postId));
+        return ($state == "0") ? 1 : 2;
+    }
+
+    return 3;
+}
+
+function updatePost($postId, $title = "", $message = "") {
+    $db = connect_db();
+
+    $query = "SELECT twitchUsername, locked FROM blogPosts WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($postId));
+    $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+    if($data["locked"] == "0") {
+        if(isset($_SESSION['username']) && ($data['twitchUsername'] == $_SESSION['username'] || $_SESSION['username'] == "trahanqc")) {
+            $query = "UPDATE blogPosts SET title = ?, message = ? WHERE id = ?";
+            $rep = $db->prepare($query);
+            $rep->execute(array($title, $message, $postId));
+            return 1;
+        }
+    }
+    else {
+        return 2;
+    }
+
+    return 3;
+}
+
+function addComment($postId, $message) {
+    $db = connect_db();
+
+    $query = "SELECT locked FROM blogPosts WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($postId));
+    $locked = $rep->fetch(PDO::FETCH_ASSOC);
+
+    if($locked["locked"] == 0) {
+        $query = "INSERT INTO blogComments VALUES(?, ?, ?, ?)";
+        $rep = $db->prepare($query);
+        $rep->execute(array('', $_SESSION['username'], $message, date('Y-m-d H:i:s', strtotime("now -6hours"))));
+        $commentId = $db->lastInsertId();
+
+        $query = "INSERT INTO blogPostsComments VALUES(?, ?, ?)";
+        $rep = $db->prepare($query);
+        $rep->execute(array('', $postId, $commentId));
+
+        return 1;
+    }
+
+    return 2;
+}
+
+function deleteComment($commentId) {
+    $db = connect_db();
+    $query = "DELETE FROM blogComments WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($commentId));
+
+    $query = "DELETE FROM blogPostsComments WHERE commentId = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($commentId));
+}
+
+function updateComment($commentId, $message = "") {
+    $db = connect_db();
+
+    $query = "SELECT c.twitchUsername, p.locked
+            FROM blogComments c
+            INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
+            INNER JOIN blogPosts p ON p.id = bpc.postId
+            WHERE c.id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($commentId));
+    $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+    if($data["locked"] == "0") {
+        if(isset($_SESSION['username']) && ($data['twitchUsername'] == $_SESSION['username'] || $_SESSION['username'] == "trahanqc")) {
+            $query = "UPDATE blogComments SET message = ? WHERE id = ?";
+            $rep = $db->prepare($query);
+            $rep->execute(array($message, $commentId));
+            return 1;
+        }
+    }
+    else {
+        return 2;
+    }
+
+    return 3;
 }
 
 function quicksort($array, $search = "") {

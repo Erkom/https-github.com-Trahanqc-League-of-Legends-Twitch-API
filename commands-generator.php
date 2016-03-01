@@ -197,7 +197,7 @@ $commands = getCommands("name");
         </div>
 
         <?php include 'includes/footer.php'; ?>
-        <script src="js/generateCommand.js"></script>
+        <script src="../js/generateCommand.js"></script>
 
     </body>
 </html>

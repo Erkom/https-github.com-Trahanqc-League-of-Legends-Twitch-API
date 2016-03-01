@@ -20,6 +20,8 @@ $(document).ready(function() {
             data: { action: "fetchMessages", id: id },
             success: function(data) {
                 $("#results").html('').html(data);
+
+                $("#results").find('time.timeago').timeago();
             }
         });
     });

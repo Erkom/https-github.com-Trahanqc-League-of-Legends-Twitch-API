@@ -1,7 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData">
+  <component name="PublishConfigData" autoUpload="Always" serverName="Trahanqc's api">
     <serverData>
+      <paths name="Trahanqc's api">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/public_html/Projets/got_me/api" local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="inscriptions">
         <serverdata>
           <mappings>
@@ -17,5 +24,6 @@
         </serverdata>
       </paths>
     </serverData>
+    <option name="myAutoUpload" value="ALWAYS" />
   </component>
 </project>

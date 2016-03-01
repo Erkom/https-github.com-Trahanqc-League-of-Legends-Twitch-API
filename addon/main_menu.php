@@ -29,9 +29,7 @@ $realUrl = $realUrl[3];
     <li <?= ($realUrl == 'patch-notes') ? 'class="active"' : ''; ?>>
         <a href="patch-notes"><i class="fa fa-fw fa-cog"></i> Patch notes</a>
     </li>
-    <?php if(!empty($user) && $user[0]['twitchUsername'] == 'trahanqc') : ?>
-        <li <?= ($realUrl == 'support' || $realUrl == 'add-message' || preg_match("/posts-([0-9])+/", $realUrl)) ? 'class="active"' : ''; ?>>
-            <a href="support"><i class="fa fa-fw fa-ticket"></i> Support</a>
-        </li>
-    <?php endif; ?>
+    <li <?= ($realUrl == 'support' || $realUrl == 'add-message' || preg_match("/posts-([0-9])+/", $realUrl)) ? 'class="active"' : ''; ?>>
+        <a href="support"><i class="fa fa-fw fa-ticket"></i> Support</a>
+    </li>
 </ul>
