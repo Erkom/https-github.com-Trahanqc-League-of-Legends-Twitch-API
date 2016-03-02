@@ -55,7 +55,7 @@ if($postLocked) {
                                     <i class="fa fa-dashboard"></i>  <a href="dashboard">Dashboard</a>
                                 </li>
                                 <li>
-                                    <i class="fa fa-ticket"></i>  <a href="support">Support</a>
+                                    <i class="fa fa-ticket"></i>  <a href="forum">Forum</a>
                                 </li>
                                 <li>
                                     <i class="fa fa-comments"></i>  Post

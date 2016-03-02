@@ -9,7 +9,7 @@ $categories = getAllFromTable("blogCategory", "", "ordre ASC");
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Support | Trahanqc's API</title>
+        <title>Forum | Trahanqc's API</title>
 
         <?php include 'includes/header.php'; ?>
 
@@ -43,14 +43,14 @@ $categories = getAllFromTable("blogCategory", "", "ordre ASC");
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-lg-12">
-                            <h1 class="page-header">Support</h1>
+                            <h1 class="page-header">Forum</h1>
 
                             <ol class="breadcrumb">
                                 <li>
                                     <i class="fa fa-dashboard"></i>  <a href="dashboard">Dashboard</a>
                                 </li>
                                 <li class="active">
-                                    <i class="fa fa-ticket"></i>  Support
+                                    <i class="fa fa-ticket"></i>  Forum
                                 </li>
                             </ol>
 

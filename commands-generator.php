@@ -105,7 +105,7 @@ $commands = getCommands("name");
                                         <th>Command name</th>
                                         <th>Command</th>
                                         <th>Channel</th>
-                                        <th>LoL ID</th>
+                                        <th>LoL ID (it should be numbers)</th>
                                         <th>Bot</th>
                                         <th>User Access</th>
                                         <th></th>
