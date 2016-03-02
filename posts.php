@@ -84,7 +84,7 @@ if($postLocked) {
                         </div>
                     </div>
 
-                    <div class="row" id="add-reply-container">
+                    <div class="row reply-operation" id="add-reply-container">
                         <div class="col-lg-12">
                             <div class="container">
                                 <div class="row">
@@ -105,7 +105,7 @@ if($postLocked) {
                         </div>
                     </div>
 
-                    <div class="row" id="edit-reply-container">
+                    <div class="row reply-operation" id="edit-reply-container">
                         <div class="col-lg-12">
                             <div class="container">
                                 <div class="row">
@@ -126,7 +126,7 @@ if($postLocked) {
                         </div>
                     </div>
 
-                    <div class="row" id="edit-post-container">
+                    <div class="row reply-operation" id="edit-post-container">
                         <div class="col-lg-12">
                             <div class="container">
                                 <div class="row">

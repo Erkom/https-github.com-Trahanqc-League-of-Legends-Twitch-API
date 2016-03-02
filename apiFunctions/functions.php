@@ -670,6 +670,70 @@ function updateComment($commentId, $message = "") {
     return 3;
 }
 
+function addPatch($title = "", $version = "", $patchNotes = "") {
+    $db = connect_db();
+
+    if(isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") {
+        $query = "INSERT INTO patchNotes VALUES(?, ?, ?, ?, ?)";
+        $rep = $db->prepare($query);
+        $rep->execute(
+            array('',
+                $title,
+                $patchNotes,
+                $version,
+                date('Y-m-d H:i:s', strtotime("now -6hours"))
+                ));
+
+        return "1";
+    }
+    else {
+        return "2";
+    }
+
+    return "3";
+}
+
+function editPatch($id, $title = "", $version = "", $patchNotes = "") {
+    $db = connect_db();
+
+    if(isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") {
+        $query = "UPDATE patchNotes SET title = ?, patchNotes = ?, version = ?, dateCreated = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(
+            array(
+                $title,
+                $patchNotes,
+                $version,
+                date('Y-m-d H:i:s', strtotime("now -6hours")),
+                $id
+            ));
+
+        return "1";
+    }
+    else {
+        return "2";
+    }
+
+    return "3";
+}
+
+function deletePatch($id) {
+    $db = connect_db();
+
+    if(isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") {
+        $query = "DELETE FROM patchNotes WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array($id));
+
+        return "1";
+    }
+    else {
+        return "2";
+    }
+
+    return "3";
+}
+
 function quicksort($array, $search = "") {
     if( count( $array ) < 2 ) {
         return $array;

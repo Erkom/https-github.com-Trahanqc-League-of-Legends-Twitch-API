@@ -94,7 +94,7 @@ $categories = getAllFromTable("blogCategory", "", "ordre ASC");
 
         <?php include 'includes/footer.php'; ?>
         <script src="../js/jquery.timeago.js"></script>
-        <script src="../js/support.js"></script>
+        <script src="../js/forum.js"></script>
 
     </body>
 </html>

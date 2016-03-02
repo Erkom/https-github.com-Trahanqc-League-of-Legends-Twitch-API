@@ -54,7 +54,14 @@ $user = checkConnect();
 
                             <p class="lead">If you like the API and would like to contribute to it, you can do so by doing a <a href="https://www.twitchalerts.com/donate/trahanqc">donation</a>!</p>
 
-                            <?php for($x = 0 ; $x < 21 ; $x++) : ?>
+                            <div class="blank"></div>
+
+                            <h4>Special thanks</h4>
+                            <ul class="list-unstyled">
+                                <li><a href="http://twitch.tv/mitchell486">Mitchell486</a></li>
+                            </ul>
+
+                            <?php for($x = 0 ; $x < 18 ; $x++) : ?>
                                 <div class="blank"></div>
                             <?php endfor; ?>
                         </div>

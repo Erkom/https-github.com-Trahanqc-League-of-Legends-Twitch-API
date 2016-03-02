@@ -33,4 +33,16 @@ switch($_POST['action']) {
     case "updateComment" :
         echo updateComment($_POST['id'], $_POST['message']);
         break;
+
+    case "addPatch" :
+        echo addPatch($_POST['title'], $_POST['version'], $_POST['patchNotes']);
+        break;
+
+    case "editPatch" :
+        echo editPatch($_POST['id'], $_POST['title'], $_POST['version'], $_POST['patchNotes']);
+        break;
+
+    case "deletePatch" :
+        echo deletePatch($_POST['id']);
+        break;
 }
