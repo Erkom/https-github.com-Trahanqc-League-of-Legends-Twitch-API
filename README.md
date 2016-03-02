@@ -6,7 +6,7 @@ I created this API for League of Legends Twitch streamers that wanted to have so
 To install any of those commands, you are required to use a bot that has an access to an Custom API.  I currently support Nightbot, Deepbot and hnlBot but there is many others that you could use.
 
 #### Adding a command
-To add a command, you can go into the [Command generator](http://gotne.site-meute.com/api/v1/commands-generator).  You will need to grab your League of Legends ID from that page and select which command you want to add into your bot.  Once every settings is done, generate the command and copy paste the output into your chat or your bot panel.
+To add a command, you can go into the [Command generator](http://gotme.site-meute.com/api/v1/commands-generator).  You will need to grab your League of Legends ID from that page and select which command you want to add into your bot.  Once every settings is done, generate the command and copy paste the output into your chat or your bot panel.
 
 #### Login with the website
 To have access to settings and multiple statistics, login with your Twitch account.  You will then be able to change the summoner name that the commands will be fetching from, the season to fetch from, etc. **Coming soon** You will also be able to edit the output of these commands.
