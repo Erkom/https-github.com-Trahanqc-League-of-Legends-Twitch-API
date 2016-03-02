@@ -32,4 +32,7 @@ $realUrl = $realUrl[3];
     <li <?= ($realUrl == 'forum' || $realUrl == 'add-message' || preg_match("/posts-([0-9])+/", $realUrl)) ? 'class="active"' : ''; ?>>
         <a href="forum"><i class="fa fa-fw fa-ticket"></i> Forum</a>
     </li>
+    <li <?= ($realUrl == 'donation') ? 'class="active"' : ''; ?>>
+        <a href="donation"><i class="fa fa-fw fa-money"></i> Donation</a>
+    </li>
 </ul>
