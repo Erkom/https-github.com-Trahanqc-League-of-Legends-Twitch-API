@@ -61,14 +61,28 @@ $message = "";
                                 $stats = getStatsAdmin();
                                 $statsGlobal = getStatsGlobal();
                                 $settings = getSettingsAdmin();
+                                $automaticNightbot = getAllFromTable('automaticNightbot')[0];
                                 
                                 if(!empty($statsGlobal)) :
                                     ?>
                                     <h1>Global Stats</h1>
                                     <div class="row">
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-12">
+                                            Automatic Nightbot used : <span id="automatic-nightbot"><?= $automaticNightbot['countUsed']; ?></span>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-lg-12" id="commands-history">
+                                            <?php commandsHistory(); ?>
+                                        </div>
+                                    </div>
+
+                                    <div class="blank"></div>
+
+                                    <div class="row">
+                                        <div class="col-lg-3">
                                             <table class="table table-hover table-striped">
-                                                <thead>
+                                                <thead class="thead-inverse">
                                                     <tr>
                                                         <th>Channel Name</th>
                                                         <th>Used</th>
@@ -77,6 +91,7 @@ $message = "";
                                                 <tbody>
                                                     <?php
                                                     $count = 0;
+                                                    $total = 0;
                                                     if(isset($statsGlobal['channels'])) :
                                                         foreach($statsGlobal['channels'] as $channel => $nb) :
                                                             if($count < 10) : ?>
@@ -85,18 +100,91 @@ $message = "";
                                                                     <td><?= $nb . " (<strong>" . Round(($nb / $statsGlobal['nbCommands']) * 100, 2) . "%</strong>)"; ?></td>
                                                                 </tr>
                                                                 <?php
+                                                                $total += $nb;
                                                             endif;
                                                             ++$count;
                                                         endforeach;
                                                     endif;
                                                     ?>
+                                                    <tr class="table-inverse">
+                                                        <td>Total</td>
+                                                        <td><?= $total; ?></td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
 
-                                        <div class="col-lg-6">
+                                        <div class="col-lg-3">
                                             <table class="table table-hover table-striped">
-                                                <thead>
+                                                <thead class="thead-inverse">
+                                                    <tr>
+                                                        <th>Channel (Last days)</th>
+                                                        <th>Used</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $count = 0;
+                                                    $total = 0;
+                                                    if(isset($statsGlobal['channelsLastDays'])) :
+                                                        foreach($statsGlobal['channelsLastDays'] as $channel => $nb) :
+                                                            if($count < 10) : ?>
+                                                                <tr>
+                                                                    <td><?= $channel; ?></td>
+                                                                    <td><?= $nb . " (<strong>" . Round(($nb / $statsGlobal['nbCommandsLastDays']) * 100, 2) . "%</strong>)"; ?></td>
+                                                                </tr>
+                                                                <?php
+                                                                $total += $nb;
+                                                            endif;
+                                                            ++$count;
+                                                        endforeach;
+                                                    endif;
+                                                    ?>
+                                                    <tr class="table-inverse">
+                                                        <td>Total</td>
+                                                        <td><?= $total; ?></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="col-lg-3">
+                                            <table class="table table-hover table-striped">
+                                                <thead class="thead-inverse">
+                                                    <tr>
+                                                        <th>Bot</th>
+                                                        <th>Used</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <?php
+                                                    $count = 0;
+                                                    $total = 0;
+                                                    if(isset($statsGlobal['bots'])) :
+                                                        foreach($statsGlobal['bots'] as $bot => $nb) :
+                                                            if($count < 10) : ?>
+                                                                <tr>
+                                                                    <td><?= $bot; ?></td>
+                                                                    <td><?= $nb . " (<strong>" . Round(($nb / $statsGlobal['nbCommands']) * 100, 2) . "%</strong>)"; ?></td>
+                                                                </tr>
+                                                                <?php
+                                                                $total += $nb;
+                                                            endif;
+                                                            ++$count;
+                                                        endforeach;
+                                                    endif;
+                                                    ?>
+                                                    <tr class="table-inverse">
+                                                        <td>Total</td>
+                                                        <td><?= $total; ?></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+                                        <div class="col-lg-3">
+                                            <table class="table table-hover table-striped">
+                                                <thead class="thead-inverse">
                                                     <tr>
                                                         <th>Date</th>
                                                         <th>Used</th>
@@ -105,23 +193,32 @@ $message = "";
                                                 <tbody>
                                                     <?php
                                                     $count = 0;
+                                                    $total = 0;
+
                                                     if(isset($statsGlobal['commandsPerDay'])) :
                                                         foreach($statsGlobal['commandsPerDay'] as $day => $nb) :
                                                             if($count < 10) : ?>
                                                                 <tr>
                                                                     <td><?= format_date($day); ?></td>
-                                                                    <td><?= $nb . " (<strong>" . Round(($nb / $statsGlobal['nbCommands']) * 100, 2) . "%</strong>)"; ?></td>
+                                                                    <td><?= $nb . " (<strong>" . Round(($nb / $statsGlobal['nbCommandsLastDays']) * 100, 2) . "%</strong>)"; ?></td>
                                                                 </tr>
                                                                 <?php
+                                                                $total += $nb;
                                                             endif;
                                                             ++$count;
                                                         endforeach;
                                                     endif;
                                                     ?>
+                                                    <tr class="table-inverse">
+                                                        <td>Total</td>
+                                                        <td><?= $total; ?></td>
+                                                    </tr>
                                                 </tbody>
                                             </table>
                                         </div>
                                     </div>
+
+                                    <div class="blank"></div>
 
                                     <h1>Stats per channel</h1>
                                 <?php
@@ -135,7 +232,7 @@ $message = "";
                                     <div class="col-lg-3">
                                         <h3>Most used commands</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Command name</th>
                                                     <th>Used</th>
@@ -164,7 +261,7 @@ $message = "";
                                     <div class="col-lg-3">
                                         <h3>User most commands</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Username</th>
                                                     <th>Used</th>
@@ -193,7 +290,7 @@ $message = "";
                                     <div class="col-lg-3">
                                         <h3>Milestones</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Milestone</th>
                                                     <th>Description</th>
@@ -219,7 +316,7 @@ $message = "";
                                     <div class="col-lg-3">
                                         <h3>Most commands per day</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Day</th>
                                                     <th>Used</th>
@@ -270,5 +367,42 @@ $message = "";
 
         <?php include 'includes/footer.php'; ?>
 
+        <script src="../js/jquery.timeago.js"></script>
+        <script>
+            var refreshHistory = 0,
+                refreshAutomaticNightbot = 0;
+
+            $(document).ready(function() {
+                $("time.timeago").timeago();
+
+                refreshHistory = setInterval(function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "../ajax/settings.php",
+                        dataType: "html",
+                        data: { action: "refreshHistory" },
+                        success: function(data) {
+                            $("#commands-history").html('').html(data);
+
+                            $("time.timeago").timeago();
+
+                            addAlert("Data refreshed! <span class='alert-span'>10</span>", "alert-success", true, true, "#messages", 10);
+                        }
+                    });
+                }, 1000 * 60 * 5);
+
+                refreshAutomaticNightbot = setInterval(function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "../ajax/settings.php",
+                        dataType: "html",
+                        data: { action: "refreshAutomaticNightbot" },
+                        success: function(data) {
+                            $("#automatic-nightbot").html('').html(data);
+                        }
+                    });
+                }, 1000 * 60 * 5);
+            });
+        </script>
     </body>
 </html>

@@ -5,6 +5,10 @@ $twitchtv = new TwitchTV;
 $user = checkConnect();
 $message = "";
 $categories = getAllFromTable("blogCategory", "", "ordre ASC");
+
+if(isset($_SESSION['username'])) {
+    updateDateForumCheck();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -94,7 +98,7 @@ $categories = getAllFromTable("blogCategory", "", "ordre ASC");
 
         <?php include 'includes/footer.php'; ?>
         <script src="../js/jquery.timeago.js"></script>
-        <script src="../js/support.js"></script>
+        <script src="../js/forum.js"></script>
 
     </body>
 </html>

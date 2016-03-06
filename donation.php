@@ -54,7 +54,35 @@ $user = checkConnect();
 
                             <p class="lead">If you like the API and would like to contribute to it, you can do so by doing a <a href="https://www.twitchalerts.com/donate/trahanqc">donation</a>!</p>
 
-                            <?php for($x = 0 ; $x < 21 ; $x++) : ?>
+                            <!--
+                            <p>
+                                The next feature that I want to add to this API is to automatically add the commands into your Nightbot panel for you.  Sadly, I need to have a secure website to do so (the https version) and this certificate cost a little bit more than <strong>$65 USD</strong>.
+                                Your donation will help be buy this certificate :)
+                            </p>
+
+                            <h4>Current progression of that goal</h4>
+
+                            <?php
+                            $progression = Round((5 / 60) * 100);
+                            if($progression < 10) $class = "progress-danger";
+                            else if($progression >= 10 && $progression < 30) $class = "progress-warning";
+                            else if($progression >= 30 && $progression < 80) $class = "progress-info";
+                            else $class = "progress-success";
+                            ?>
+
+                            <progress class="progress <?= $class; ?>" value="5" max="65"><?= $progression; ?>%</progress>
+                            <strong><?= $progression; ?>%</strong>
+
+                            -->
+
+                            <div class="blank"></div>
+
+                            <h4>Special thanks</h4>
+                            <ul class="list-unstyled">
+                                <li><a href="http://twitch.tv/mitchell486">Mitchell486</a></li>
+                            </ul>
+
+                            <?php for($x = 0 ; $x < 18 ; $x++) : ?>
                                 <div class="blank"></div>
                             <?php endfor; ?>
                         </div>

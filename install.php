@@ -71,8 +71,7 @@ $user = checkConnect();
 
                             <p>
                                 To see a detailed list of all available commands, you can go on the <a href="commands-list">Commands list</a> page!  All of these commands are comming from the <a href="https://developer.riotgames.com/">official Riot API</a>. <br>
-                                You can use the install notes below or go into the <a href="commands-generator">Commands generator</a> to create the commands you want. <br>
-                                <strong>Please note that it is working for each region but you have to change it within the settings of the application by connecting to your twitch account.  Also, to add support for the english version, add <code>&lang=en</code> at the end of any url.</strong>
+                                You can use the install notes below or go into the <a href="commands-generator">Commands generator</a> to create the commands you want.
                             </p>
 
                             <!--
@@ -84,7 +83,7 @@ $user = checkConnect();
                             -->
                             <h3 class="bot-name" id="nightbot">Nightbot</h3>
                             <p>Nightbot is one of the most popular bot for Twitch.  It is free to use and really easy to setup.  More information about Nightbot at : <a href="http://nightbot.tv">www.nightbot.tv</a> (I recommend to upgrade to the Beta v4 version since it's nearly ready to launch)</p>
-                            <p>With Nightbot, there is 2 ways to add a command.  You can either add it directly into your Twitch chat :</p>
+                            <p>With Nightbot, there is 3 ways to add a command.  You can either add it directly into your Twitch chat :</p>
                             <p>
                                 <code>!addcom !rank $(customapi http://gotme.site-meute.com/query.php?action=rank&id=<mark>YOURACCOUNTID</mark>&channel=<mark>YOURCHANNEL</mark>&user=$(user)&bot=Nightbot)</code>
                             </p>
@@ -98,6 +97,12 @@ $user = checkConnect();
                             </p>
                             <p>You need to change <mark>YOURACCOUNTID</mark> by the <a href="https://developer.riotgames.com/api/methods#!/1061/3663">id of your League of Legends's account</a> and <mark>YOURCHANNEL</mark> by your Twitch channel's name.</p>
                             <p>To have the command in english, add <code>&lang=en</code> after the parameter <code>&bot=Nightbot</code> like so : <code>...&user=$(user)&bot=Nightbot&lang=en)</code></p>
+
+                            <p>
+                                The third option would be to add the command directly into your Nightbot panel from within this API.  <strong>Note: This require you to connect to this API with your Twitch account and to allow Nightbot to access to your account on this API.</strong>  To do so, connect to the API, then head to the <a href="settings">Settings</a> and allow Nightbot to access your account.
+                                After that, go into the <a href="commands-generator">Commands generator</a> and click the <code>Add into Nightbot</code> button!  It's really easy and the faster way because you won't make any copy pasta mistakes ;)
+                            </p>
+
                             <p>See the screenshot for more options : </p>
                             <img src="../pictures/nightbot.PNG">
 

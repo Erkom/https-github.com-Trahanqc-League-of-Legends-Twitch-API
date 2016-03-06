@@ -19,6 +19,13 @@ $userAccess = array(
 );
 
 $commands = getCommands("name");
+$regions = getRegions();
+$nightbotSettings = array();
+$customCommands = array();
+
+if(isset($_SESSION['username'])) {
+    $nightbotSettings = grabNightbotSettings();
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -71,9 +78,11 @@ $commands = getCommands("name");
                             <p>The command generator allow you to generate any command from the <a href="commands-list">command list</a> easily.  You will need to add the command in the proper bot application.</p>
                             <p>You will need to generate your <a href="https://developer.riotgames.com/api/methods#!/1061/3663">League of Legends ID</a> in order to use any of those commands (won't be necessary in a near futur).</p>
 
+                            <div class="blank"></div>
+
                             <div class="row">
                                 <div class="col-lg-2 fix-lineheight">
-                                    Find your League of Legends ID :
+                                    <strong>Find your League of Legends ID</strong>
                                 </div>
 
                                 <div class="col-lg-2">
@@ -83,9 +92,13 @@ $commands = getCommands("name");
                                 </div>
 
                                 <div class="col-lg-1">
-                                    <select class="form-control col-lg-3" id="region" disabled>
-                                        <option value="na">NA</option>
-                                    </select>
+                                    <div class="form-group">
+                                        <select id="region" class="c-select">
+                                            <?php foreach($regions as $val) : ?>
+                                                <option value="<?= $val['region']; ?>" <?= ($val['region'] == 'NA') ? 'selected' : ''; ?>><?= $val['region']; ?></option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
                                 </div>
 
                                 <div class="col-lg-2">
@@ -106,6 +119,7 @@ $commands = getCommands("name");
                                         <th>Command</th>
                                         <th>Channel</th>
                                         <th>LoL ID (it should be numbers)</th>
+                                        <th>Region</th>
                                         <th>Bot</th>
                                         <th>User Access</th>
                                         <th></th>
@@ -117,33 +131,41 @@ $commands = getCommands("name");
                                             <div class="form-group">
                                                 <div class="input-group">
                                                     <div class="input-group-addon">!</div>
-                                                    <input type="text" class="form-control" id="command_name">
+                                                    <input type="text" class="form-control" id="command_name" value="<?= (isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") ? 'rank' : ''; ?>">
                                                 </div>
                                             </div>
-
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <select id="command" class="form-control">
+                                                <select id="command" class="c-select full-width">
                                                     <?php foreach($commands as $id => $c) : ?>
-                                                        <option value="<?= $c['called']; ?>" data-addonNb="<?= $c['addonNb']; ?>" data-addonDb="<?= $c['addonDb']; ?>" data-addonHb="<?= $c['addonHb']; ?>"><?= $c['name']; ?></option>
+                                                        <option value="<?= $c['called']; ?>" data-addonNb="<?= $c['addonNb']; ?>" data-addonDb="<?= $c['addonDb']; ?>" data-addonHb="<?= $c['addonHb']; ?>" <?= (isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc" && $c['called'] == "rank") ? 'selected' : ''; ?>><?= $c['name']; ?></option>
                                                     <?php endforeach; ?>
                                                 </select>
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="channel_name">
+                                                <input type="text" class="form-control" id="channel_name" value="<?= (isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") ? 'trahanqc' : ''; ?>">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <input type="text" class="form-control" id="lol_id">
+                                                <input type="text" class="form-control" id="lol_id" value="<?= (isset($_SESSION['username']) && $_SESSION['username'] == "trahanqc") ? '40579311' : ''; ?>">
                                             </div>
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <select id="bot_name" class="form-control">
+                                                <select id="region_form" class="c-select full-width">
+                                                    <?php foreach($regions as $val) : ?>
+                                                        <option value="<?= $val['region']; ?>" <?= ($val['region'] == 'NA') ? 'selected' : ''; ?>><?= $val['region']; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select id="bot_name" class="c-select full-width">
                                                     <?php foreach($bots as $id => $name) : ?>
                                                         <option value="<?= $id; ?>"><?= $name; ?></option>
                                                     <?php endforeach; ?>
@@ -152,7 +174,7 @@ $commands = getCommands("name");
                                         </td>
                                         <td>
                                             <div class="form-group">
-                                                <select id="user_access" class="form-control">
+                                                <select id="user_access" class="c-select full-width">
                                                     <?php foreach($userAccess as $id => $name) : ?>
                                                         <option value="<?= $id; ?>"><?= $name; ?></option>
                                                     <?php endforeach; ?>
@@ -164,6 +186,7 @@ $commands = getCommands("name");
                                         </td>
                                     </tr>
                                     <tr>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>
@@ -185,6 +208,28 @@ $commands = getCommands("name");
                                     <h4>Or put the following command in <span id="backend-title-bot"></span> backend: </h4>
                                 </div>
                                 <div id="backend-command" class="command-code"></div>
+
+                                <div id="nightbotOnly">
+                                    <div id="nightbotOnly-title">
+                                        <h4>Add this command automatically</h4>
+                                    </div>
+                                    <div id="nightbotOnly-description">
+                                        <strong>Warning: this functionnality is going to add this command into your own Nightbot panel.  You can't add it automatically into another user's Nightbot panel</strong>
+                                        <br>
+                                        <br>
+                                        <div class="row">
+                                            <?php if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") : ?>
+                                                <div class="col-lg-3">
+                                                    <button class="btn btn-primary full-width" id="add-command-nightbot" data-message="Processing..."><i class="fa fa-plus"></i> Add <span id="add-command-nightbot-name"></span> to your Nightbot panel</button>
+                                                </div>
+                                            <?php else : ?>
+                                                <div class="col-lg-12">
+                                                    <p class="lead">To have access to this functionnality, you need to allow this API to access your Nightbot panel.  You can do so by going into the <a href="settings">Settings</a></p>
+                                                </div>
+                                            <?php endif; ?>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
                             <?php for($x = 0 ; $x < 14 ; $x++) : ?>

@@ -33,4 +33,40 @@ switch($_POST['action']) {
     case "updateComment" :
         echo updateComment($_POST['id'], $_POST['message']);
         break;
+
+    case "addPatch" :
+        echo addPatch($_POST['title'], $_POST['version'], $_POST['patchNotes']);
+        break;
+
+    case "editPatch" :
+        echo editPatch($_POST['id'], $_POST['title'], $_POST['version'], $_POST['patchNotes']);
+        break;
+
+    case "deletePatch" :
+        echo deletePatch($_POST['id']);
+        break;
+
+    case "refreshHistory" :
+        commandsHistory();
+        break;
+
+    case "refreshAutomaticNightbot" :
+        echo getAllFromTable("automaticNightbot")[0]['countUsed'];
+        break;
+
+    case "unlinkNightbot" :
+        echo unlinkNightbot();
+        break;
+
+    case "checkNightbotLink" :
+        echo json_encode(grabCustomCommands());
+        break;
+
+    case "addNightbotCommand" :
+        echo addNightbotCommand($_POST);
+        break;
+
+    case "editNightbotCommand" :
+        echo editNightbotCommand($_POST);
+        break;
 }
