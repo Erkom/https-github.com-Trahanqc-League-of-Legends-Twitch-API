@@ -5,6 +5,10 @@ $twitchtv = new TwitchTV;
 $user = checkConnect();
 $message = "";
 $categories = getAllFromTable("blogCategory", "", "ordre ASC");
+
+if(isset($_SESSION['username'])) {
+    updateDateForumCheck();
+}
 ?>
 <!DOCTYPE html>
 <html>

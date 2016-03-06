@@ -45,4 +45,28 @@ switch($_POST['action']) {
     case "deletePatch" :
         echo deletePatch($_POST['id']);
         break;
+
+    case "refreshHistory" :
+        commandsHistory();
+        break;
+
+    case "refreshAutomaticNightbot" :
+        echo getAllFromTable("automaticNightbot")[0]['countUsed'];
+        break;
+
+    case "unlinkNightbot" :
+        echo unlinkNightbot();
+        break;
+
+    case "checkNightbotLink" :
+        echo json_encode(grabCustomCommands());
+        break;
+
+    case "addNightbotCommand" :
+        echo addNightbotCommand($_POST);
+        break;
+
+    case "editNightbotCommand" :
+        echo editNightbotCommand($_POST);
+        break;
 }

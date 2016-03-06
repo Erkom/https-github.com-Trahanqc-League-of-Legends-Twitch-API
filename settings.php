@@ -6,6 +6,20 @@ $user = checkConnect();
 $message = (empty($user)) ? addAlert("You are not currently logged in with your Twitch account.  To do so, click on the Login button on the upper right.", "alert-danger", true) : '';
 $commands = getCommands();
 $regions = getRegions();
+
+$nightbotSettings = array();
+
+if(isset($_SESSION['username'])) {
+    $nightbotSettings = grabNightbotSettings();
+}
+
+$nightbot = getAllFromTable('nightbot');
+$clientId = $nightbot[0]['client_id'];
+$redirectURI = "https://gotme.site-meute.com/api/v1/dashboard";
+
+if(isset($_GET['nightbotConnect'])) {
+    $message = addAlert("Nightbot is now connected to your account!", "alert-success", true);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -74,7 +88,7 @@ $regions = getRegions();
 
                                     <div class="col-lg-1">
                                         <div class="form-group">
-                                            <select id="region" class="form-control">
+                                            <select id="region" class="c-select full-width">
                                                 <?php foreach($regions as $val) : ?>
                                                     <option value="<?= $val['region']; ?>" <?= ($user[0]['region'] == $val['region']) ? 'selected' : '';?>><?= $val['region']; ?></option>
                                                 <?php endforeach; ?>
@@ -85,7 +99,7 @@ $regions = getRegions();
 
                                     <div class="col-lg-2">
                                         <div class="form-group">
-                                            <select id="season" class="form-control">
+                                            <select id="season" class="c-select full-width">
                                                 <option value="SEASON2016" <?= ($user[0]['season'] == 'SEASON2016') ? 'selected' : ''; ?>>Season 2016</option>
                                                 <option value="SEASON2015" <?= ($user[0]['season'] == 'SEASON2015') ? 'selected' : ''; ?>>Season 2015</option>
                                                 <option value="SEASON2014" <?= ($user[0]['season'] == 'SEASON2014') ? 'selected' : ''; ?>>Season 2014</option>
@@ -96,7 +110,7 @@ $regions = getRegions();
 
                                     <div class="col-lg-2">
                                         <div class="form-group">
-                                            <select id="lang" class="form-control">
+                                            <select id="lang" class="c-select full-width">
                                                 <option value="en" <?= ($user[0]['lang'] == 'en') ? 'selected' : ''; ?>>English</option>
                                                 <option value="fr" <?= ($user[0]['lang'] == 'fr') ? 'selected' : ''; ?>>Fran&ccedil;ais</option>
                                             </select>
@@ -108,6 +122,23 @@ $regions = getRegions();
                                         <button class="btn btn-success full-width" id="changeSummonerName" data-message="Saving..."><i class="fa fa-save"></i>  Save</button>
                                     </div>
                                 </div>
+
+                                <div class="row">
+                                    <?php if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") : ?>
+                                        <div class="col-lg-3 fix-lineheight">Unlink the API to have access to your Nightbot</div>
+                                        <div class="col-lg-2">
+                                            <a class="btn btn-danger full-width" href="#" id="unlink-Nightbot">Unlink Nightbot</a>
+                                        </div>
+                                    <?php else : ?>
+                                        <div class="col-lg-3 fix-lineheight">Login with Nightbot to add commands automatically</div>
+                                        <div class="col-lg-2">
+                                            <a class="btn btn-info full-width" href="https://api.nightbot.tv/oauth2/authorize?response_type=code&client_id=<?= $clientId; ?>&redirect_uri=<?= $redirectURI; ?>&scope=commands">Log in with Nightbot</a>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+
+                                <div class="blank"></div>
+                                <div class="blank"></div>
 
                                 <p><strong>You will be able to change these settings very soon!</strong></p>
                                 <table class="table table-hover table-striped" id="commands-table">
@@ -201,6 +232,23 @@ $regions = getRegions();
                     else {
                         summonerName.closest('.form-group').addClass('has-danger');
                     }
+                });
+
+                $("#unlink-Nightbot").on('click', function(e) {
+                    $.ajax({
+                        type: "POST",
+                        url: "../ajax/settings.php",
+                        dataType: "html",
+                        data: { action: "unlinkNightbot" },
+                        success: function(data) {
+                            if(data === "1") {
+                                location.reload();
+                            }
+                            else {
+                                addAlert("Error: unable to remove Nightbot from your channel at the moment.  Try again later <span class='alert-span'>5</span>", "alert-danger", true, true, "#messages", 5, "#unlink-Nightbot");
+                            }
+                        }
+                    });
                 });
             });
         </script>

@@ -85,7 +85,7 @@ body {
 }
 
 #commands-generator td:first-child, #commands-generator td:nth-child(3), #commands-generator td:nth-child(4) {
-    max-width: 300px;
+    width: 200px;
 }
 
 .command-title {
@@ -153,6 +153,10 @@ body {
     padding-right: 0;
 }
 
+tr.table-inverse td {
+    background-color: #55595c;
+}
+
 .fa.spinning {
     animation: spin 1s infinite linear;
     -webkit-animation: spin2 1s infinite linear;
@@ -177,7 +181,7 @@ body {
 }
 
 .post-content {
-    background-color: #F0EDF1;
+    background-color: #f3f3f3;
     border-radius: 3px;
     margin-bottom: 15px;
     border: 1px solid lightgray;
@@ -185,7 +189,12 @@ body {
 }
 
 .post-content:nth-child(even) {
-    background-color: rgba(240, 237, 241, 0.4);
+    background-color: #e4e4e4;
+    border-color: #bbb;
+}
+
+.post-content:nth-child(even) .divider {
+    border-color: #bbb;
 }
 
 .post-content .divider {

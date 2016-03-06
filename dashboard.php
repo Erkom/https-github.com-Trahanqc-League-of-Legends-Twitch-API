@@ -3,7 +3,26 @@ include 'apiFunctions/init.php';
 $twitchtv = new TwitchTV;
 
 $user = checkConnect();
-$message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['username'] . "</strong>, welcome to the Trahanqc's API!", "alert-success", true) : '';
+if(!isset($_SESSION['loggedIn']) && isset($_SESSION['username'])) {
+    $messageWelcome = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['username'] . "</strong>, welcome to the Trahanqc's API!", "alert-success", true) : '';
+    $_SESSION['loggedIn'] = true;
+}
+
+if(isset($_SESSION['username'])) {
+    $message = ($user[0]["summonerName"] == "YOURSUMMONERNAME") ? addAlert("<strong>Heads up!</strong> Go change your summoner name on the <a href='settings'>Settings</a> page to allow commands to work on your channel!", "alert-info", true) : '';
+}
+
+if(isset($_GET['code'])) {
+    $nightbotWork = updateNightbotCode($_GET['code']);
+
+    if($nightbotWork) {
+        header("Location: http://gotme.site-meute.com/api/v1/settings?nightbotConnect=true");
+        exit();
+    }
+    else {
+        $message = addAlert("There was a problem adding the Nightbot into your settings", "alert-danger", true);
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -50,6 +69,7 @@ $message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['userna
                                 </li>
                             </ol>
 
+                            <div id="messages-welcome"><?= $messageWelcome; ?></div>
                             <div id="messages"><?= $message; ?></div>
 
                             <?php
@@ -62,7 +82,7 @@ $message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['userna
                                     <div class="col-lg-6">
                                         <h3>Most used commands</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Command name</th>
                                                     <th>Used</th>
@@ -91,7 +111,7 @@ $message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['userna
                                     <div class="col-lg-6">
                                         <h3>User with most used commands</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Username</th>
                                                     <th>Used</th>
@@ -124,7 +144,7 @@ $message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['userna
                                     <div class="col-lg-6">
                                         <h3>Days with most commands used</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Day</th>
                                                     <th>Used</th>
@@ -154,7 +174,7 @@ $message = (!empty($user)) ? addAlert("Hello there <strong>" . $_SESSION['userna
                                     <div class="col-lg-6">
                                         <h3>Milestones</h3>
                                         <table class="table table-hover table-striped">
-                                            <thead>
+                                            <thead class="thead-inverse">
                                                 <tr>
                                                     <th>Milestone</th>
                                                     <th>Description</th>

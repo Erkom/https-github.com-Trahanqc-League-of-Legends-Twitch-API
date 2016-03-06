@@ -117,7 +117,7 @@ function getStatsUsername($username) {
     /**
      * Gather most commands per day
      */
-    $query = "SELECT COUNT(*) as nbCommands, dateUsed FROM lolStats WHERE LOWER(channelName) = ? GROUP BY dateUsed ORDER BY nbCommands DESC, dateUsed DESC";
+    $query = "SELECT COUNT(*) as nbCommands, dateUsed FROM lolStats WHERE LOWER(channelName) = ? GROUP BY CAST(dateUsed AS DATE) ORDER BY nbCommands DESC, dateUsed DESC";
     $rep = $db->prepare($query);
     $rep->execute(array($username));
 
@@ -186,6 +186,9 @@ function getStatsGlobal() {
 
     $stats = array();
 
+    $currentDate = date('Y-m-d', strtotime("now -6hours"));
+    $lastDate = date('Y-m-d', strtotime("now -10days -6hours"));
+
     /**
      * Gather all the commands
      */
@@ -193,6 +196,14 @@ function getStatsGlobal() {
     $rep = $db->prepare($query);
     $rep->execute();
     $stats["nbCommands"] = $rep->fetch(PDO::FETCH_NUM)[0];
+
+    /**
+     * Gather all the commands last 10 days
+     */
+    $query = "SELECT COUNT(*) FROM lolStats WHERE dateUsed BETWEEN ? AND ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($lastDate, $currentDate));
+    $stats["nbCommandsLastDays"] = $rep->fetch(PDO::FETCH_NUM)[0];
 
     /**
      * Gather all the commands for each channel
@@ -206,14 +217,36 @@ function getStatsGlobal() {
     }
 
     /**
+     * Gather all the commands for each channel
+     */
+    $query = "SELECT COUNT(*) as nbCommands, channelName FROM lolStats WHERE dateUsed BETWEEN ? AND ? GROUP BY channelName ORDER BY nbCommands DESC, channelName ASC";
+    $rep = $db->prepare($query);
+    $rep->execute(array($lastDate, $currentDate));
+
+    while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) {
+        $stats["channelsLastDays"][$donnees['channelName']] = $donnees['nbCommands'];
+    }
+
+    /**
      * Gather all the commands for each day
      */
-    $query = "SELECT COUNT(*) as nbCommands, dateUsed FROM lolStats GROUP BY dateUsed ORDER BY dateUsed DESC";
+    $query = "SELECT COUNT(*) as nbCommands, dateUsed FROM lolStats WHERE CAST(dateUsed AS DATE) BETWEEN ? AND ? GROUP BY CAST(dateUsed AS DATE) ORDER BY dateUsed DESC";
+    $rep = $db->prepare($query);
+    $rep->execute(array($lastDate, $currentDate));
+
+    while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) {
+        $stats["commandsPerDay"][$donnees['dateUsed']] = $donnees["nbCommands"];
+    }
+
+    /**
+     * Gather all the commands for each day
+     */
+    $query = "SELECT COUNT(*) as nbCommands, bot FROM lolStats GROUP BY bot ORDER BY bot ASC";
     $rep = $db->prepare($query);
     $rep->execute();
 
     while($donnees = $rep->fetch(PDO::FETCH_ASSOC)) {
-        $stats["commandsPerDay"][$donnees['dateUsed']] = $donnees["nbCommands"];
+        $stats["bots"][$donnees['bot']] = $donnees["nbCommands"];
     }
 
     return $stats;
@@ -315,7 +348,7 @@ function fetchMessages($category = "all") {
     ?>
         <table class="table table-hover table-striped">
             <thead>
-                <tr>
+                <tr class="thead-inverse">
                     <th>Title</th>
                     <th>Created by</th>
                     <th>Category</th>
@@ -525,6 +558,47 @@ function fetchPost($id) {
     endif;
 }
 
+
+/**
+ * TODO Migth want to add a parameter to determine how many we should grab
+ */
+function commandsHistory() {
+    $db = connect_db();
+    $query = "SELECT * FROM lolStats ORDER BY id DESC LIMIT 15";
+    $rep = $db->prepare($query);
+    $rep->execute();
+    ?>
+    <table class="table table-hover table-striped">
+        <thead class="thead-inverse">
+            <tr>
+                <th>Username</th>
+                <th>Channel</th>
+                <th>Command</th>
+                <th>Id</th>
+                <th>Region</th>
+                <th>Addon</th>
+                <th>Bot</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <?php while($val = $rep->fetch(PDO::FETCH_ASSOC)) : ?>
+                <tr>
+                    <td><?= $val['username']; ?></td>
+                    <td><a href="http://twitch.tv/<?= $val['channelName']; ?>"><?= $val['channelName']; ?></a></td>
+                    <td><?= $val['command']; ?></td>
+                    <td><?= $val['leagueId']; ?></td>
+                    <td><?= $val['region']; ?></td>
+                    <td><?= $val['addon']; ?></td>
+                    <td><?= $val['bot']; ?></td>
+                    <td><time class="timeago" datetime="<?= $val['dateUsed']; ?>"><?= format_date($val['dateUsed']); ?></time></td>
+                </tr>
+            <?php endwhile; ?>
+        </tbody>
+    </table>
+    <?php
+}
+
 function getDisabled($id) {
     $db = connect_db();
     $query = "SELECT locked FROM blogPosts WHERE id = ?";
@@ -732,6 +806,200 @@ function deletePatch($id) {
     }
 
     return "3";
+}
+
+function updateDateForumCheck() {
+    $db = connect_db();
+    $query = "UPDATE settingsApi SET dateForumCheck = ? WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array(date("Y-m-d H:i:s", strtotime("now -6hours")), $_SESSION['uid']));
+}
+
+function updateNightbotCode($code) {
+    $nightbot = getAllFromTable('nightbot');
+
+    $parameters = array(
+        "client_id" => $nightbot[0]['client_id'],
+        "client_secret" => $nightbot[0]['client_secret'],
+        "code" => $code,
+        "grant_type" => "authorization_code",
+        "redirect_uri" => "https://gotme.site-meute.com/api/v1/accept-nightbot-token"
+    );
+
+    $ch = curl_init("https://api.nightbot.tv/oauth2/token");
+    curl_setopt($ch, CURLOPT_POST, true);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $result = curl_exec($ch);
+    curl_close($ch);
+    $jsonData = json_decode($result, true);
+
+    if(array_key_exists("access_token", $jsonData)) {
+        $db = connect_db();
+        $query = "UPDATE settingsApi SET nightbotCode = ?, nightbotToken = ?, nightbotRefresh = ?, nightbotTime = ?, nightbotExpire = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array($code, $jsonData["access_token"], $jsonData["refresh_token"], time() - 60 * 60 * 6, $jsonData['expires_in'], $_SESSION['uid']));
+        return 1;
+    }
+
+    return 2;
+}
+
+function grabNightbotSettings() {
+    $db = connect_db();
+    $query = "SELECT nightbotCode, nightbotToken, nightbotRefresh, nightbotTime, nightbotExpire FROM settingsApi WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($_SESSION['uid']));
+
+    return $rep->fetch(PDO::FETCH_ASSOC);
+}
+
+function unlinkNightbot() {
+    $nightbotSettings = grabNightbotSettings();
+
+    if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") {
+        $parameters = array(
+            "token" => $nightbotSettings['nightbotToken']
+        );
+
+        $ch = curl_init("https://api.nightbot.tv/oauth2/token/revoke");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+
+        $db = connect_db();
+        $query = "UPDATE settingsApi SET nightbotToken = ?, nightbotRefresh = ?, nightbotTime = ?, nightbotExpire = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array("", "", 0, 0, $_SESSION['uid']));
+
+        return 1;
+    }
+
+    return 2;
+}
+
+function grabCustomCommands() {
+    $nightbotSettings = grabNightbotSettings();
+
+    if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") {
+        $ch = curl_init("https://api.nightbot.tv/1/commands");
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Authorization: Bearer ' . $nightbotSettings['nightbotToken']
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $jsonData = json_decode($result, true);
+
+        if(!empty($jsonData)) {
+            if($jsonData["status"] == "200") {
+                return $jsonData;
+            }
+            else {
+                return 2;
+            }
+        }
+    }
+
+    return 2;
+}
+
+function addNightbotCommand($data) {
+    $nightbotSettings = grabNightbotSettings();
+
+    if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") {
+        $userLevel = "everyone";
+        switch($data['userLevel']) {
+            case 2 : $userLevel = "regular"; break;
+            case 3 : $userLevel = "subscriber"; break;
+            case 4 : $userLevel = "moderator"; break;
+            case 5 : $userLevel = "owner"; break;
+        }
+
+        $parameters = array(
+            "message" => $data["commandMessage"],
+            "userLevel" => $userLevel,
+            "name" => $data["commandName"],
+            "coolDown" => 30
+        );
+
+        $ch = curl_init("https://api.nightbot.tv/1/commands");
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Authorization: Bearer ' . $nightbotSettings['nightbotToken']
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $jsonData = json_decode($result, true);
+
+        if(!empty($jsonData)) {
+            if($jsonData["status"] == "200") {
+                $db = connect_db();
+                $query = "UPDATE automaticNightbot SET countUsed = countUsed + 1";
+                $rep = $db->prepare($query);
+                $rep->execute();
+
+                return 1;
+            }
+            else {
+                return 2;
+            }
+        }
+    }
+
+    return 2;
+}
+
+function editNightbotCommand($data) {
+    $nightbotSettings = grabNightbotSettings();
+
+    if(!empty($nightbotSettings) && $nightbotSettings != NULL && $nightbotSettings['nightbotToken'] != "") {
+        $userLevel = "everyone";
+        switch($data['userLevel']) {
+            case 2 : $userLevel = "regular"; break;
+            case 3 : $userLevel = "subscriber"; break;
+            case 4 : $userLevel = "moderator"; break;
+            case 5 : $userLevel = "owner"; break;
+        }
+
+        $parameters = array(
+            "message" => $data["commandMessage"],
+            "userLevel" => $userLevel,
+            "name" => $data["commandName"]
+        );
+
+        $ch = curl_init("https://api.nightbot.tv/1/commands/" . $data['commandId']);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($parameters));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'Authorization: Bearer ' . $nightbotSettings['nightbotToken']
+        ));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PUT");
+        $result = curl_exec($ch);
+        curl_close($ch);
+        $jsonData = json_decode($result, true);
+
+        if(!empty($jsonData)) {
+            if($jsonData["status"] == "200") {
+                $db = connect_db();
+                $query = "UPDATE automaticNightbot SET countUsed = countUsed + 1";
+                $rep = $db->prepare($query);
+                $rep->execute();
+
+                return 1;
+            }
+            else {
+                return 2;
+            }
+        }
+    }
+
+    return 2;
 }
 
 function quicksort($array, $search = "") {

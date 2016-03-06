@@ -2,6 +2,8 @@
 $realUrl = $_SERVER['REQUEST_URI'];
 $realUrl = explode('/', $realUrl);
 $realUrl = $realUrl[3];
+$realUrl = explode('?', $realUrl);
+$realUrl = $realUrl[0];
 ?>
 <ul class="nav navbar-nav side-nav">
     <li <?= ($realUrl == 'dashboard') ? 'class="active"' : ''; ?>>
@@ -14,7 +16,7 @@ $realUrl = $realUrl[3];
     <?php endif; ?>
     <?php if(!empty($user) && $user[0]['twitchUsername'] == 'trahanqc') : ?>
         <li <?= ($realUrl == 'stats') ? 'class="active"' : ''; ?>>
-            <a href="stats"><i class="fa fa-fw fa-bar-chart"></i> stats</a>
+            <a href="stats"><i class="fa fa-fw fa-bar-chart"></i> Stats</a>
         </li>
     <?php endif; ?>
     <li <?= ($realUrl == 'install') ? 'class="active"' : ''; ?>>
@@ -30,7 +32,7 @@ $realUrl = $realUrl[3];
         <a href="patch-notes"><i class="fa fa-fw fa-cog"></i> Patch notes</a>
     </li>
     <li <?= ($realUrl == 'forum' || $realUrl == 'add-message' || preg_match("/posts-([0-9])+/", $realUrl)) ? 'class="active"' : ''; ?>>
-        <a href="forum"><i class="fa fa-fw fa-ticket"></i> Forum</a>
+        <a href="forum"><i class="fa fa-fw fa-ticket"></i> Forum <span class="label label-default"></span></a>
     </li>
     <li <?= ($realUrl == 'donation') ? 'class="active"' : ''; ?>>
         <a href="donation"><i class="fa fa-fw fa-money"></i> Donation</a>
