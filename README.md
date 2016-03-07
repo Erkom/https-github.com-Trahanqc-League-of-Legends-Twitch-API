@@ -106,4 +106,4 @@ Display your overall winning pourcentage and your top 5 champions with 5 games o
 ```
 
 ## Questions/Suggestions/Problems
-Feel free to contact me on [Twitch](http://www.twitch.tv/trahanqc/profile) or use the [forum](http://gotme.site-meute.com/api/v1/support) on the API Website
+Feel free to contact me on [Twitch](http://www.twitch.tv/trahanqc/profile) or use the [forum](http://gotme.site-meute.com/api/v1/forum) on the API Website
