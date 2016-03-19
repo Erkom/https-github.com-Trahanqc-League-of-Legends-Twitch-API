@@ -64,6 +64,14 @@ $user = checkConnect();
                                 </thead>
                                 <tbody>
                                     <tr>
+                                        <td>!championPoints</td>
+                                        <td>Display your champion points with a champion and if a chest has been granted or not</td>
+                                        <td>
+                                            <code>Trahanqc: !championPoints tristana</code><br>
+                                            <code>Nightbot: Champion level 5 (58190 points). Chest granted!</code>
+                                        </td>
+                                    </tr>
+                                    <tr>
                                         <td>!doublekills</td>
                                         <td>Display the number of doublekills you have and with which champions.  <strong>Note: be careful, the response may be long!</strong></td>
                                         <td>
