@@ -65,7 +65,7 @@ $user = checkConnect();
                                 <tbody>
                                     <tr>
                                         <td>!championPoints</td>
-                                        <td>Display your champion points with a champion and if a chest has been granted or not</td>
+                                        <td>Display your champion points with a champion and if a chest has been granted.</td>
                                         <td>
                                             <code>Trahanqc: !championPoints tristana</code><br>
                                             <code>Nightbot: Champion level 5 (58190 points). Chest granted!</code>
