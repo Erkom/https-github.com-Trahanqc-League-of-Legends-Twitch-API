@@ -14,6 +14,13 @@ To have access to settings and multiple statistics, login with your Twitch accou
 ## Available commands
 There is a lot of commands currently available through the application.  So see further notes on these commands, go check out the [commands list](http://gotme.site-meute.com/api/v1/commands-list)
 
+#### !championPoints champion_name
+Display your champion points with a champion and if a chest has been granted.
+```
+!championPoints tristana
+> Champion level 5 (58190 points).  Chest granted!
+```
+
 #### !doublekills
 Display the numbers of doublekills you have and with which champions.
 ```
