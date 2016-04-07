@@ -26,6 +26,8 @@ $customCommands = array();
 if(isset($_SESSION['username'])) {
     $nightbotSettings = grabNightbotSettings();
 }
+
+$message = addAlert("Support for AnkhBot is comming soon! :D", "alert-info", true);
 ?>
 <!DOCTYPE html>
 <html>
@@ -38,6 +40,8 @@ if(isset($_SESSION['username'])) {
     <body>
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
+
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
 
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
@@ -74,6 +78,8 @@ if(isset($_SESSION['username'])) {
                                     <i class="fa fa-code"></i>  Commands generator
                                 </li>
                             </ol>
+
+                            <div id="alerts"><?= $message; ?></div>
 
                             <p>The command generator allow you to generate any command from the <a href="commands-list">command list</a> easily.  You will need to add the command in the proper bot application.</p>
                             <p>You will need to generate your <a href="https://developer.riotgames.com/api/methods#!/1061/3663">League of Legends ID</a> in order to use any of those commands (won't be necessary in a near futur).</p>
@@ -183,6 +189,65 @@ if(isset($_SESSION['username'])) {
                                         </td>
                                         <td>
                                             <button id="generate_command" class="btn btn-default">Generate</button>
+                                        </td>
+                                    </tr>
+                                    <tr class="table-info">
+                                        <td>
+                                            <div class="form-group">
+                                                <div class="input-group">
+                                                    <div class="input-group-addon">!</div>
+                                                    <input type="text" class="form-control" id="command_name_example" value="rank" disabled>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select id="command_example" class="c-select full-width" disabled>
+                                                    <?php foreach($commands as $id => $c) : ?>
+                                                        <option value="<?= $c['called']; ?>" data-addonNb="<?= $c['addonNb']; ?>" data-addonDb="<?= $c['addonDb']; ?>" data-addonHb="<?= $c['addonHb']; ?>" <?= ($c['name'] == '!rank') ? 'selected' : ''; ?>><?= $c['name']; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="channel_name_example" value="trahanqc" disabled>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <input type="text" class="form-control" id="lol_id_example" value="40579311" disabled>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select id="region_form_example" class="c-select full-width" disabled>
+                                                    <?php foreach($regions as $val) : ?>
+                                                        <option value="<?= $val['region']; ?>" <?= ($val['region'] == 'NA') ? 'selected' : ''; ?>><?= $val['region']; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select id="bot_name_example" class="c-select full-width" disabled>
+                                                    <?php foreach($bots as $id => $name) : ?>
+                                                        <option value="<?= $id; ?>"><?= $name; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="form-group">
+                                                <select id="user_access_example" class="c-select full-width" disabled>
+                                                    <?php foreach($userAccess as $id => $name) : ?>
+                                                        <option value="<?= $id; ?>"><?= $name; ?></option>
+                                                    <?php endforeach; ?>
+                                                </select>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            Example line
                                         </td>
                                     </tr>
                                     <tr>

@@ -16,6 +16,8 @@ $user = checkConnect();
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
 
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
+
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
                     <li class="nav-item dropdown">
@@ -52,7 +54,7 @@ $user = checkConnect();
                                 </li>
                             </ol>
 
-                            <p class="lead">If you like the API and would like to contribute to it, you can do so by doing a <a href="https://www.twitchalerts.com/donate/trahanqc">donation</a>!</p>
+                            <p class="lead">If you like the API and would like to contribute to it, you can do so by doing a <a href="https://www.twitchalerts.com/donate/trahanqc">donation</a>!  All the donations will be used to maintain the API and pay for the server fees so the API can keep running.</p>
 
                             <!--
                             <p>

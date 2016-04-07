@@ -54,6 +54,10 @@ switch($_POST['action']) {
         echo getAllFromTable("automaticNightbot")[0]['countUsed'];
         break;
 
+    case "refreshForum" :
+        echo lastForumCheck($_SESSION['uid']);
+        break;
+
     case "unlinkNightbot" :
         echo unlinkNightbot();
         break;
@@ -68,5 +72,13 @@ switch($_POST['action']) {
 
     case "editNightbotCommand" :
         echo editNightbotCommand($_POST);
+        break;
+
+    case "saveCommand" :
+        echo saveCommand($_POST['commandName'], $_POST['response']);
+        break;
+
+    case "removeCommand" :
+        echo removeCommand($_POST['commandName']);
         break;
 }

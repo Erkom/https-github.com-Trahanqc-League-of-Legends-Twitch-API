@@ -16,6 +16,8 @@ $user = checkConnect();
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
 
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
+
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
                     <li class="nav-item dropdown">
@@ -132,7 +134,7 @@ $user = checkConnect();
                                         <td>Display your current League of Legends ranking.</td>
                                         <td>
                                             <code>Trahanqc: !rank</code><br>
-                                            <code>Nightbot: Gold V (86 LP) Series: O X -</code>
+                                            <code>Nightbot: Gold V (86 LP) Series: ✓ X -</code>
                                         </td>
                                     </tr>
                                     <tr>
@@ -140,7 +142,7 @@ $user = checkConnect();
                                         <td>Display the current League of Legends ranking of <code>Summoner name</code>.</td>
                                         <td>
                                             <code>Trahanqc: !rankof trahanqc</code><br>
-                                            <code>Nightbot: Gold V (86 LP) Series: O X -</code>
+                                            <code>Nightbot: Gold V (86 LP) Series: ✓ X -</code>
                                         </td>
                                     </tr>
                                     <tr>

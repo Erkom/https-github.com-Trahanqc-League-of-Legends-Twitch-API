@@ -26,20 +26,26 @@ function loginUser($username, $code, $access_token) {
         $uid = $foundUser;
     }
     else {
-        $query = "INSERT INTO settingsApi VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $query = "INSERT INTO settingsApi VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $rep = $db->prepare($query);
         $rep->execute(
             array('',
                 $username,
                 $code,
                 $access_token,
-                json_encode(array()),
+                '{}',
                 'YOURSUMMONERID',
                 'YOURSUMMONERNAME',
                 'YOURREGION',
                 'SEASON2016',
                 'en',
-                date('Y-m-d H:i:s', strtotime('now -6hours'))
+                date('Y-m-d H:i:s', strtotime('now -6hours')),
+                '0000-00-00',
+                '',
+                '',
+                '',
+                0,
+                0
                 ));
         $uid = $db->lastInsertId();
     }
@@ -219,7 +225,7 @@ function getStatsGlobal() {
     /**
      * Gather all the commands for each channel
      */
-    $query = "SELECT COUNT(*) as nbCommands, channelName FROM lolStats WHERE dateUsed BETWEEN ? AND ? GROUP BY channelName ORDER BY nbCommands DESC, channelName ASC";
+    $query = "SELECT COUNT(*) as nbCommands, channelName FROM lolStats WHERE CAST(dateUsed AS DATE) BETWEEN ? AND ? GROUP BY channelName ORDER BY nbCommands DESC, channelName ASC";
     $rep = $db->prepare($query);
     $rep->execute(array($lastDate, $currentDate));
 
@@ -334,7 +340,7 @@ function fetchMessages($category = "all") {
           WHERE p.id = ?";
     $rep2 = $db->prepare($query2);
 
-    $query3 = "SELECT c.datePosted
+    $query3 = "SELECT c.datePosted, c.twitchUsername as commentUser
             FROM blogComments c
             INNER JOIN blogPostsComments bpc ON bpc.commentId = c.id
             INNER JOIN blogPosts p ON p.id = bpc.postId
@@ -365,14 +371,16 @@ function fetchMessages($category = "all") {
 
                     $rep3->execute(array($donnees['id']));
                     $lastActivity = $rep3->fetch(PDO::FETCH_ASSOC);
+
+                    $lastActivityName = ($lastActivity != NULL) ? $lastActivity["commentUser"] : $donnees['twitchUsername'];
                     ?>
                     <tr>
                         <td><a href="posts-<?= $donnees['id']; ?>"><?= ($donnees['locked'] == 1) ? '<i class="fa fa-lock"></i> ' . $donnees['title'] : $donnees['title']; ?></a></td>
-                        <td><?= $donnees['twitchUsername']; ?></td>
+                        <td><?= ($donnees['twitchUsername'] == 'trahanqc') ? $donnees['twitchUsername'] . " <small class='text-success'>Admin</small>" : $donnees['twitchUsername']; ?></td>
                         <td><?= $donnees["category"]; ?></td>
                         <td><?= $nbComments; ?></td>
                         <td><?= $donnees['views']?></td>
-                        <td><time class="timeago" datetime="<?= ($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']; ?>"><?= format_date(($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']); ?></time></td>
+                        <td><time class="timeago" datetime="<?= ($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']; ?>"><?= format_date(($lastActivity != NULL) ? $lastActivity["datePosted"] : $donnees['datePosted']); ?></time> by <?= ($lastActivityName == "trahanqc") ? $lastActivityName . " <small class='text-success'>Admin</small>" : $lastActivityName; ?></td>
                     </tr>
                 <?php endwhile; ?>
             </tbody>
@@ -484,7 +492,7 @@ function fetchPost($id) {
                 <div class="row">
                     <div class="col-lg-2">
                         <div class="post-details">
-                            <?= $post["main"]['twitchUsername']; ?> <br>
+                            <?= ($post["main"]['twitchUsername'] == "trahanqc") ? $post["main"]['twitchUsername'] . " <small class='text-success'>Admin</small>" : $post["main"]['twitchUsername']; ?> <br>
                             <time class="timeago" datetime="<?= $post["main"]['datePosted']; ?>"><?= format_date($post["main"]['datePosted']); ?></time>
                         </div>
                     </div>
@@ -523,7 +531,7 @@ function fetchPost($id) {
                         <div class="row">
                             <div class="col-lg-2">
                                 <div class="post-details">
-                                    <?= $val['twitchUsername']; ?> <br>
+                                    <?= ($val['twitchUsername'] == 'trahanqc') ? $val['twitchUsername'] . ' <small class=\'text-success\'>Admin</small>' : $val['twitchUsername']; ?> <br>
                                     <time class="timeago" datetime="<?= $val['datePosted']; ?>"><?= format_date($val['datePosted']); ?></time>
                                 </div>
                             </div>
@@ -564,11 +572,11 @@ function fetchPost($id) {
  */
 function commandsHistory() {
     $db = connect_db();
-    $query = "SELECT * FROM lolStats ORDER BY id DESC LIMIT 15";
+    $query = "SELECT * FROM lolStats ORDER BY id DESC LIMIT 50";
     $rep = $db->prepare($query);
     $rep->execute();
     ?>
-    <table class="table table-hover table-striped">
+    <table class="table table-hover table-striped table-sm">
         <thead class="thead-inverse">
             <tr>
                 <th>Username</th>
@@ -637,8 +645,8 @@ function addBlogPost($title, $category, $message, $username) {
 function deletePost($postId) {
     $db = connect_db();
     $query = "DELETE p, bpc, c FROM blogPosts p
-            INNER JOIN blogPostsComments bpc ON bpc.postId = p.id
-            INNER JOIN blogComments c ON c.id = bpc.commentId
+            LEFT JOIN blogPostsComments bpc ON bpc.postId = p.id
+            LEFT JOIN blogComments c ON c.id = bpc.commentId
             WHERE p.id = ?";
     $rep = $db->prepare($query);
     $rep->execute(array($postId));
@@ -742,6 +750,28 @@ function updateComment($commentId, $message = "") {
     }
 
     return 3;
+}
+
+function lastForumCheck($uid) {
+    $nbNotif = 0;
+
+    $db = connect_db();
+    $query = "SELECT dateForumCheck FROM settingsApi WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($uid));
+    $lastChecked = $rep->fetch(PDO::FETCH_ASSOC)["dateForumCheck"];
+
+    $query = "SELECT COUNT(id) FROM blogPosts WHERE datePosted > ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($lastChecked));
+    $nbNotif += $rep->fetch(PDO::FETCH_NUM)[0];
+
+    $query = "SELECT COUNT(id) FROM blogComments WHERE datePosted > ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($lastChecked));
+    $nbNotif += $rep->fetch(PDO::FETCH_NUM)[0];
+
+    return ($nbNotif == 0) ? '' : $nbNotif;
 }
 
 function addPatch($title = "", $version = "", $patchNotes = "") {
@@ -1000,6 +1030,73 @@ function editNightbotCommand($data) {
     }
 
     return 2;
+}
+
+function saveCommand($commandName, $response) {
+    if($commandName != "" && $response != "") {
+        $db = connect_db();
+        $query = "SELECT data FROM settingsApi WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array($_SESSION['uid']));
+        $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+        $data = json_decode($data["data"]);
+
+        $data->$commandName = htmlspecialchars($response);
+
+        $query = "UPDATE settingsApi SET data = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array(json_encode($data), $_SESSION['uid']));
+
+        return 1;
+    }
+
+    return 2;
+}
+
+function removeCommand($commandName) {
+    if($commandName != "") {
+        $db = connect_db();
+        $query = "SELECT data FROM settingsApi WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array($_SESSION['uid']));
+        $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+        $data = json_decode($data["data"]);
+
+        unset($data->$commandName);
+
+        $query = "UPDATE settingsApi SET data = ? WHERE id = ?";
+        $rep = $db->prepare($query);
+        $rep->execute(array(json_encode($data), $_SESSION['uid']));
+
+        return 1;
+    }
+
+    return 2;
+}
+
+function getCommandsResponse() {
+    $db = connect_db();
+    $query = "SELECT data FROM settingsApi WHERE id = ?";
+    $rep = $db->prepare($query);
+    $rep->execute(array($_SESSION['uid']));
+    $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+    return json_decode($data["data"]);
+}
+
+function getDateCommandNumber() {
+    $db = connect_db();
+    $query = "SELECT * FROM milestonesGlobal ORDER BY id DESC LIMIT 1";
+    $rep = $db->prepare($query);
+    $rep->execute();
+    $data = $rep->fetch(PDO::FETCH_ASSOC);
+
+    $now = strtotime("2016-02-25");
+    $your_date = strtotime($data['dateAchieved']);
+    $datediff = abs($now - $your_date);
+    return array("days" => floor($datediff/(60*60*24)), "channel" => $data['channel'], "number" => $data['number']);
 }
 
 function quicksort($array, $search = "") {

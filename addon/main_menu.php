@@ -32,7 +32,7 @@ $realUrl = $realUrl[0];
         <a href="patch-notes"><i class="fa fa-fw fa-cog"></i> Patch notes</a>
     </li>
     <li <?= ($realUrl == 'forum' || $realUrl == 'add-message' || preg_match("/posts-([0-9])+/", $realUrl)) ? 'class="active"' : ''; ?>>
-        <a href="forum"><i class="fa fa-fw fa-ticket"></i> Forum <span class="label label-default"></span></a>
+        <a href="forum"><i class="fa fa-fw fa-ticket"></i> Forum <span class="label label-default"><?= lastForumCheck($_SESSION['uid']); ?></span></a>
     </li>
     <li <?= ($realUrl == 'donation') ? 'class="active"' : ''; ?>>
         <a href="donation"><i class="fa fa-fw fa-money"></i> Donation</a>

@@ -146,7 +146,7 @@ $(document).ready(function() {
             dataType: "html",
             data: { action : "deletePost", id: postId },
             success: function() {
-                window.location.href = "http://gotme.site-meute.com/api/v1/support";
+                window.location.href = "http://gotme.site-meute.com/api/v1/forum";
             }
         });
     });

@@ -6,6 +6,7 @@ $user = checkConnect();
 $message = (empty($user)) ? addAlert("You are not currently logged in with your Twitch account.  To do so, click on the Login button on the upper right.", "alert-danger", true) : '';
 $commands = getCommands();
 $regions = getRegions();
+$commandsResponse = getCommandsResponse();
 
 $nightbotSettings = array();
 
@@ -32,6 +33,8 @@ if(isset($_GET['nightbotConnect'])) {
     <body>
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
+
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
 
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
@@ -140,13 +143,13 @@ if(isset($_GET['nightbotConnect'])) {
                                 <div class="blank"></div>
                                 <div class="blank"></div>
 
-                                <p><strong>You will be able to change these settings very soon!</strong></p>
+                                <p>To see what these commands are displaying, go check the <a href="commands-list">Commands list</a> !</p>
                                 <table class="table table-hover table-striped" id="commands-table">
                                     <thead>
                                         <tr>
                                             <th>Command Name</th>
                                             <th>Response</th>
-                                            <th>Available settings</th>
+                                            <th>Available variables</th>
                                             <th></th>
                                         </tr>
                                     </thead>
@@ -155,11 +158,23 @@ if(isset($_GET['nightbotConnect'])) {
                                             <tr>
                                                 <td><?= $val['name']; ?></td>
                                                 <td>
-                                                    <textarea class="form-control" id="command-<?= $val['name']; ?>" disabled><?= $val['response']; ?></textarea>
+                                                    <div class="form-group">
+                                                        <textarea class="form-control" id="command-<?= $val['called']; ?>"><?= (array_key_exists($val['called'], $commandsResponse)) ? $commandsResponse->$val['called'] : $val['response']; ?></textarea>
+                                                    </div>
                                                 </td>
-                                                <td></td>
                                                 <td>
-                                                    <button class="btn btn-success saveCommand" data-command="<?= $val['name']; ?>" disabled><i class="fa fa-save"></i>  Save</button>
+                                                    <?php
+                                                    $variables = explode(',', $val['variables']);
+                                                    foreach($variables as $key => $v) {
+                                                        $variables[$key] = "<kbd>" . $v . "</kbd>";
+                                                    }
+                                                    $variables = implode(' ', $variables);
+                                                    echo $variables;
+                                                    ?>
+                                                </td>
+                                                <td>
+                                                    <button class="btn btn-success saveCommand" data-command="<?= $val['called']; ?>"><i class="fa fa-save"></i>  Save</button>
+                                                    <button class="btn btn-warning removeCommand" data-command="<?= $val['called']; ?>" data-default="<?= $val['response']; ?>"><i class="fa fa-close"></i>  Default</button>
                                                 </td>
                                             </tr>
                                         <?php endforeach; ?>
@@ -182,76 +197,7 @@ if(isset($_GET['nightbotConnect'])) {
 
         <?php include 'includes/footer.php'; ?>
 
-        <script>
-            $(document).ready(function() {
-                $(".navbar-fixed-top .nav a").on('click', function() {
-                    window.location.href = $(this).attr('href');
-                });
-
-                $("#changeSummonerName").on('click', function() {
-                    var summonerName = $("#summonerName"),
-                        region = $("#region"),
-                        season = $("#season"),
-                        lang = $("#lang");
-
-                    if($.trim(summonerName.val()) !== "") {
-                        if(summonerName.closest('.form-group').has('has-danger')) {
-                            summonerName.closest('.form-group').removeClass('has-danger');
-                        }
-
-                        $.ajax({
-                            type: "POST",
-                            url: "../ajax/summonerID.php",
-                            dataType: "html",
-                            data: { summonerName: summonerName.val(), region: region.val() },
-                            success: function(data) {
-                                if(data.length == 0 || data.length > 10) {
-                                    addAlert("The summoner name does not exist.", "alert-danger", true, true, "#messages", 3, "#changeSummonerName");
-                                }
-                                else {
-                                    $.ajax({
-                                        type: "POST",
-                                        url: "../ajax/settings.php",
-                                        dataType: "html",
-                                        data: { action: "updateSummonerName", summonerName: summonerName.val(), region: region.val(), summonerId: data, season: season.val(), lang: lang.val() },
-                                        success: function(data) {
-                                            if(data === "1") {
-                                                addAlert("The commands has been updated successfully! <span class='alert-span'>3</span>", "alert-success", true, true, "#messages", 3, "#changeSummonerName");
-                                            }
-                                            else {
-                                                addAlert(data, "alert-danger", true, true, "#messages");
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-
-
-                    }
-                    else {
-                        summonerName.closest('.form-group').addClass('has-danger');
-                    }
-                });
-
-                $("#unlink-Nightbot").on('click', function(e) {
-                    $.ajax({
-                        type: "POST",
-                        url: "../ajax/settings.php",
-                        dataType: "html",
-                        data: { action: "unlinkNightbot" },
-                        success: function(data) {
-                            if(data === "1") {
-                                location.reload();
-                            }
-                            else {
-                                addAlert("Error: unable to remove Nightbot from your channel at the moment.  Try again later <span class='alert-span'>5</span>", "alert-danger", true, true, "#messages", 5, "#unlink-Nightbot");
-                            }
-                        }
-                    });
-                });
-            });
-        </script>
+        <script src="../js/settings.js"></script>
 
     </body>
 </html>

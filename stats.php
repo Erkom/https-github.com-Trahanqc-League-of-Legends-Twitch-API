@@ -3,6 +3,9 @@ include 'apiFunctions/init.php';
 $twitchtv = new TwitchTV;
 
 $user = checkConnect();
+if($_SESSION['username'] != "trahanqc") {
+    header("Location: dashboard");
+}
 $message = "";
 ?>
 <!DOCTYPE html>
@@ -16,6 +19,8 @@ $message = "";
     <body>
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
+
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
 
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
@@ -370,7 +375,8 @@ $message = "";
         <script src="../js/jquery.timeago.js"></script>
         <script>
             var refreshHistory = 0,
-                refreshAutomaticNightbot = 0;
+                refreshAutomaticNightbot = 0,
+                refreshForum = 0;
 
             $(document).ready(function() {
                 $("time.timeago").timeago();
@@ -386,7 +392,7 @@ $message = "";
 
                             $("time.timeago").timeago();
 
-                            addAlert("Data refreshed! <span class='alert-span'>10</span>", "alert-success", true, true, "#messages", 10);
+                            addAlert("Data refreshed! <span class='alert-span'>295</span>", "alert-success", true, true, "#messages", 59 * 5);
                         }
                     });
                 }, 1000 * 60 * 5);
@@ -399,6 +405,19 @@ $message = "";
                         data: { action: "refreshAutomaticNightbot" },
                         success: function(data) {
                             $("#automatic-nightbot").html('').html(data);
+                        }
+                    });
+                }, 1000 * 60 * 5);
+
+                refreshForum = setInterval(function() {
+                    $.ajax({
+                        type: "POST",
+                        url: "../ajax/settings.php",
+                        dataType: "html",
+                        data: { action: "refreshForum" },
+                        success: function(data) {
+                            $(".nav.side-nav li .label").html('').html(data);
+                            document.title = (data !== "") ? "(" + data + ") Stats | Trahanqc's API" : "Stats | Trahanqc's API";
                         }
                     });
                 }, 1000 * 60 * 5);

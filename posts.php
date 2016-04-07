@@ -23,6 +23,8 @@ if($postLocked) {
         <nav class="navbar navbar-fixed-top navbar-dark bg-inverse">
             <a class="navbar-brand" href="dashboard">Trahanqc's API</a>
 
+            <div class="globalMessage"><?= $messageGlobal; ?></div>
+
             <ul class="nav nav-pills nav-right" role="tablist" data-toggle="pill">
                 <?php if(!empty($user)) : ?>
                     <li class="nav-item dropdown">

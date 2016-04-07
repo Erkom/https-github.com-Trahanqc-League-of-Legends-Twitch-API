@@ -45,7 +45,7 @@ $(document).ready(function() {
                 currentCommand.push(userAccess.val());
                 currentCommand.push("en");
 
-                commandChat = "!addcom" + commandAddon + " !" + commandName.val() + " $(customapi http://gotme.site-meute.com/query.php?action=" + command.val() + "&id=" + lolId.val() + "" + commandSupp + "&channel=" + channel.val() + "&amp;region=" + region.val() + "&user=$(user)&bot=Nightbot&lang=en)";
+                commandChat = "!commands add " + commandAddon + " !" + commandName.val() + " $(customapi http://gotme.site-meute.com/query.php?action=" + command.val() + "&id=" + lolId.val() + "" + commandSupp + "&channel=" + channel.val() + "&amp;region=" + region.val() + "&user=$(user)&bot=Nightbot&lang=en)";
                 commandBackend = "$(customapi http://gotme.site-meute.com/query.php?action=" + command.val() + "&id=" + lolId.val() + "" + commandSupp + "&channel=" + channel.val() + "&amp;region=" + region.val() + "&user=$(user)&bot=Nightbot&lang=en)";
                 backendTitle = "Nightbot's";
 
