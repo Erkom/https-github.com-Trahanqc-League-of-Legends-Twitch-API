@@ -811,7 +811,7 @@ function getPentakills($summonerId, $field, $min = 1, $lang = 'en', $channel = "
 
                 foreach($pentakills as $penta) {
                     if($penta['id'] != 0) {
-                        $finalString[] = $champions[$penta['id']]['name'] . " (" . $penta[$field] . ")";
+                        $finalString[] = $champions[$penta['id']]['displayName'] . " (" . $penta[$field] . ")";
                     }
                 }
 
