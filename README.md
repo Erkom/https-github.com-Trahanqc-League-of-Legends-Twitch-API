@@ -112,5 +112,8 @@ Display your overall winning pourcentage and your top 5 champions with 5 games o
 > Overall : 48% Top 5 : 1. Blitzcrank (83.3%), 2. Brand (66.7%), 3. Ekko (57.1%), 4. Shaco (56.3%), 5. Morgana (40%)
 ```
 
+## Contribute to this project
+If you want to help with the code, I'm willing to take suggestions and improvement of it!  Also, if you want to donate you can do it on [Twitchalerts](https://www.twitchalerts.com/donate/trahanqc)
+
 ## Questions/Suggestions/Problems
 Feel free to contact me on [Twitch](http://www.twitch.tv/trahanqc/profile) or use the [forum](http://gotme.site-meute.com/api/v1/forum) on the API Website
