@@ -539,8 +539,8 @@ function getStats($id, $viewer, $champion, $lang = 'en', $channel = '', $region)
 
         if(!isset($jsonData['status'])) {
             foreach($jsonData['champions'] as $val) {
-                if($val['id'] != 0 && strtolower($champion) == strtolower($champions[$val['id']]['name'])) {
-                    $data['name'] = $champions[$val['id']]['name'];
+                if($val['id'] != 0 && strtolower($champion) == strtolower($champions[$val['id']]['displayName'])) {
+                    $data['name'] = $champions[$val['id']]['displayName'];
                     $data['winRate'] = ($val['stats']['totalSessionsLost'] == 0) ? '100' : round(($val['stats']['totalSessionsWon'] / $val['stats']['totalSessionsPlayed']) * 100, 1);
                     $data['win'] = $val['stats']['totalSessionsWon'];
                     $data['lose'] = $val['stats']['totalSessionsLost'];
@@ -709,7 +709,7 @@ function lastGame($summonerId, $lang = 'en', $channel = '', $region) {
                     }
 
                     $outputValues["win"] = $winLose;
-                    $outputValues["champion"] = $champions[$champion]['name'];
+                    $outputValues["champion"] = $champions[$champion]['displayName'];
                     $outputValues["kills"] = $kills . '/' . $deaths . '/' . $assists;
                     $outputValues["kda"] = $KDA;
                     $outputValues["kill_participation"] = $killParticipation . "%";
@@ -1068,7 +1068,7 @@ function getChampionPoints($summonerId, $lang, $channel, $region, $champion) {
 
     if(count($champions) > 0) {
         foreach($champions as $v) {
-            if(strtolower($v['name']) == strtolower($champion)) {
+            if(strtolower($v['displayName']) == strtolower($champion)) {
                 $championId = $v['id'];
             }
         }
