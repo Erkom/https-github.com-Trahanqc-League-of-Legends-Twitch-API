@@ -18,7 +18,7 @@ There is a lot of commands currently available through the application.  So see 
 Display your champion points with a champion and if a chest has been granted.
 ```
 !championPoints tristana
-> Champion level 5 (58190 points).  Chest granted!
+> Champion level 5 (58190 points - S).  Chest granted!
 ```
 
 #### !doublekills
